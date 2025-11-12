@@ -1,102 +1,562 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Winky – Solana Safety Bot</title>
-<style>
-  /* Standard-Launcher von Chatbase ausblenden (nur der Button, nicht das Fenster) */
-  .cb-bubble-launcher { display: none !important; }
 
-  /* Position des eigenen Launchers */
-  #winky-launcher {
-    position: fixed; right: 24px; bottom: 24px;
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: #0f0f0f;
-    box-shadow: 0 8px 30px rgba(0,255,255,.25), inset 0 0 12px rgba(0,255,255,.1);
-    display:flex; align-items:center; justify-content:center;
-    cursor: pointer; z-index: 99999;
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
-  #winky-launcher:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px rgba(0,255,255,.35), inset 0 0 16px rgba(0,255,255,.14);
-  }
+  <style>
+    :root {
+      --bg: #050608;
+      --card: #0b0f14;
+      --accent: #00fff7;
+      --accent-soft: rgba(0,255,247,0.12);
+      --accent-strong: rgba(0,255,247,0.25);
+      --text-main: #f7f7f7;
+      --text-muted: #a3abb8;
+      --danger: #ff4d72;
+      --green: #7cff4d;
+    }
 
-  /* Augen */
-  .eyes { position: relative; width: 34px; height: 18px; }
-  .eye {
-    position:absolute; top:0; width:14px; height:18px; border-radius: 12px;
-    background:#fff; overflow:hidden;
-    animation: blink 5s infinite;
-  }
-  .eye.left  { left:0; }
-  .eye.right { right:0; }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* Pupillen */
-  .pupil {
-    position:absolute; top:4px; left:4px; width:6px; height:6px;
-    background:#000; border-radius:50%;
-    animation: look 6s ease-in-out infinite;
-  }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: radial-gradient(circle at top, #07121c 0, var(--bg) 55%);
+      color: var(--text-main);
+    }
 
-  /* Blinzeln (Deckel skaliert die Höhe) */
-  @keyframes blink {
-    0%, 92%, 100% { transform: scaleY(1); }
-    94% { transform: scaleY(.15); }
-    96% { transform: scaleY(1); }
-  }
-  /* Pupillen schauen leicht nach rechts/links */
-  @keyframes look {
-    0%, 40%   { transform: translateX(0); }
-    50%, 65%  { transform: translateX(2px); }
-    75%, 100% { transform: translateX(0); }
-  }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
 
-  /* optional: kleiner „Schein“ unter dem Button */
-  #winky-shadow {
-    position: fixed; right: 32px; bottom: 18px; width: 48px; height: 10px;
-    border-radius: 50%; background: radial-gradient(ellipse, rgba(0,255,255,.25), rgba(0,0,0,0) 70%);
-    filter: blur(3px); z-index: 99998; pointer-events:none;
-  }
-</style>
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .nav {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-eyes {
+      font-size: 22px;
+    }
+
+    .nav-links a {
+      margin-left: 18px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 52px 20px 72px;
+      text-align: center;
+    }
+
+    .hero-eyes {
+      font-size: 72px;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 5vw, 48px);
+      margin: 6px 0 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-subtitle {
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .hero-buttons {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      color: var(--text-main);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s ease, transform .15s ease,
+        box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #020303;
+      box-shadow: 0 0 18px var(--accent-strong);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 26px var(--accent-strong);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.04);
+      transform: translateY(-1px);
+    }
+
+    .btn span {
+      margin-left: 6px;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto 80px;
+      padding: 0 20px 80px;
+    }
+
+    section {
+      margin-top: 40px;
+    }
+
+    .section-label {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: 26px;
+      margin: 0 0 10px;
+    }
+
+    .section-text {
+      margin: 0 0 24px;
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.12), var(--card));
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .pill.good {
+      border-color: rgba(124,255,77,0.6);
+      color: var(--green);
+    }
+
+    .pill.warn {
+      border-color: rgba(255,77,114,0.6);
+      color: var(--danger);
+    }
+
+    .roadmap {
+      border-left: 2px solid rgba(255,255,255,0.12);
+      margin-top: 18px;
+      padding-left: 18px;
+    }
+
+    .roadmap-item {
+      position: relative;
+      margin-bottom: 18px;
+      padding-left: 10px;
+    }
+
+    .roadmap-dot {
+      position: absolute;
+      left: -21px;
+      top: 4px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-strong);
+    }
+
+    .roadmap-phase {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .roadmap-title {
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .roadmap-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .fees-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.1fr) minmax(0,1fr);
+      gap: 16px;
+    }
+
+    .list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .list li + li {
+      margin-top: 4px;
+    }
+
+    .footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .footer a {
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 720px) {
+      .fees-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding-top: 34px;
+      }
+      .nav {
+        padding-top: 14px;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div style="font-size:72px">👀</div>
-    <h1>Winky</h1>
-    <p>Your friendly AI bot for safe Solana token launches.</p>
-    <a class="btn" href="https://github.com/SvdowUser/winky-site">GitHub Repo</a>
-  </div>
+  <!-- Navigation -->
+  <header class="nav">
+    <div class="nav-brand">
+      <span class="nav-eyes">👀</span>
+      <span>Winky</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#fees">Fees</a>
+    </nav>
+  </header>
 
-  <!-- 💬 Winky Chatbase Widget -->
-    <!-- Winky Chat (Chatbase) -->
+  <!-- HERO -->
+  <main>
+    <section class="hero">
+      <div class="hero-eyes">👀</div>
+      <h1 class="hero-title">Winky – Solana Safety Bot</h1>
+      <p class="hero-subtitle">
+        Your AI agent for launching and scanning Solana meme tokens – with a focus on safety,
+        transparency and simple UX.
+      </p>
+
+      <div class="hero-buttons">
+        <a class="btn btn-primary" href="#how">
+          Launch with Winky<span>→</span>
+        </a>
+        <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
+          Open chat<span>👀</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="page">
+      <!-- HOW IT WORKS -->
+      <section id="how">
+        <div class="section-label">How Winky works</div>
+        <h2 class="section-title">From idea to safe meme launch in 3 steps</h2>
+        <p class="section-text">
+          Winky guides you through the full flow: from naming your token, to generating branding,
+          to launching in a way that protects buyers as much as possible.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <h3>1. Connect & describe</h3>
+            <p>
+              Connect your wallet and tell Winky what you want to launch: name, ticker, supply and
+              basic vibe of your meme.
+            </p>
+          </article>
+          <article class="card">
+            <h3>2. Safe launch template</h3>
+            <p>
+              Winky prepares a safe launch configuration: anti-rug mechanics, fair launch timing and
+              no hidden functions in the contract.
+            </p>
+          </article>
+          <article class="card">
+            <h3>3. Branding & sharing</h3>
+            <p>
+              Winky generates a description, logo and banner ideas so you can instantly share your
+              token on X, Telegram and more.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section id="features">
+        <div class="section-label">Toolkit</div>
+        <h2 class="section-title">What Winky can do for you</h2>
+        <p class="section-text">
+          At launch, Winky is a simple chat interface. Over time, it evolves into a full Solana
+          meme toolkit – available on web, Telegram and later CEX integrations.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <h3>Safe token launch</h3>
+            <p>
+              Step-by-step guidance to launch meme tokens without obvious rug mechanics or sniping
+              traps.
+            </p>
+            <div class="pill-row">
+              <div class="pill good">Anti-rug focus</div>
+              <div class="pill">Launch presets</div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Token scanner</h3>
+            <p>
+              Paste a token address and let Winky highlight red flags in liquidity, mint authority,
+              ownership and more.
+            </p>
+            <div class="pill-row">
+              <div class="pill warn">Risk hints</div>
+              <div class="pill">Quick checks</div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Trend radar</h3>
+            <p>
+              Get a high-level view on what kind of Solana memes are trending, so you can position
+              your own launch better.
+            </p>
+            <div class="pill-row">
+              <div class="pill">Narratives</div>
+              <div class="pill">Community focus</div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Branding generator</h3>
+            <p>
+              Let Winky propose names, taglines, logo ideas and banner prompts so your coin looks
+              ready from day one.
+            </p>
+            <div class="pill-row">
+              <div class="pill">Logos</div>
+              <div class="pill">Banners</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ROADMAP -->
+      <section id="roadmap">
+        <div class="section-label">Roadmap</div>
+        <h2 class="section-title">Where Winky is going</h2>
+        <p class="section-text">
+          This is an experimental project. Winky will ship in small, clear steps – from a simple
+          chatbot to a full launch stack with CEX integrations.
+        </p>
+
+        <div class="roadmap">
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div class="roadmap-phase">Phase 1 · MVP</div>
+            <div class="roadmap-title">Landing page & AI chat assistant</div>
+            <p class="roadmap-text">
+              Basic website, Winky chatbot embedded, simple launch & scan guidance for Solana meme
+              tokens.
+            </p>
+          </div>
+
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div class="roadmap-phase">Phase 2 · Launch tools</div>
+            <div class="roadmap-title">Guided launch & branding generator</div>
+            <p class="roadmap-text">
+              Interactive flows for safe token launches, automatic branding suggestions and export
+              for X / Telegram.
+            </p>
+          </div>
+
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div class="roadmap-phase">Phase 3 · Winky ecosystem</div>
+            <div class="roadmap-title">Fees, leaderboard & community rewards</div>
+            <p class="roadmap-text">
+              Small launch fees are shared between the creator and the Winky treasury, funding
+              marketing, community events and a public leaderboard of top-performing Winky launches.
+            </p>
+          </div>
+
+          <div class="roadmap-item">
+            <div class="roadmap-dot"></div>
+            <div class="roadmap-phase">Phase 4 · CEX integrations</div>
+            <div class="roadmap-title">Tier-3/2 CEX listings & growth budget</div>
+            <p class="roadmap-text">
+              Treasury funds are used to target lower-tier CEX listings first (Bitget-style), then
+              scale towards higher tiers – always communicated transparently to the community.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEES / TOKENOMICS TEASER -->
+      <section id="fees">
+        <div class="section-label">Fees & usage</div>
+        <h2 class="section-title">How Winky fees are intended to be used</h2>
+        <p class="section-text">
+          Exact numbers can still change, but the idea is simple: small launch fees, mostly recycled
+          into marketing, listings and community.
+        </p>
+
+        <div class="fees-grid">
+          <article class="card">
+            <h3>Launch fees (example idea)</h3>
+            <ul class="list">
+              <li>~2 USD equivalent per token launch via Winky.</li>
+              <li>Optional: tiny % on volume for advanced tools (later).</li>
+              <li>No hidden costs, clearly shown before a launch is confirmed.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>What the fees are used for</h3>
+            <ul class="list">
+              <li>Marketing campaigns for Winky and Winky-born tokens.</li>
+              <li>Treasury for CEX listing fees (starting with lower tiers).</li>
+              <li>Community rewards, events and leaderboard incentives.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>© 2025 Winky · Experimental Solana meme tooling. DYOR.</span>
+    <span>
+      <a href="#top">Back to top</a>
+      ·
+      <a href="https://github.com/SvdowUser/winky-site" target="_blank" rel="noreferrer">GitHub</a>
+    </span>
+  </footer>
+
+  <!-- Optional: Funktion für Hero-Button, der Chat öffnet -->
   <script>
-  (function(){
-    if(!window.chatbase || window.chatbase("getState")!=="initialized"){
-      window.chatbase=(...arguments)=>{
-        if(!window.chatbase.q){window.chatbase.q=[]}
-        window.chatbase.q.push(arguments)
-      };
-      window.chatbase=new Proxy(window.chatbase,{
-        get(target,prop){
-          if(prop==="q"){return target.q}
-          return(...args)=>target(prop,...args)
+    function openWinkyFromHero() {
+      try {
+        if (window.chatbase) {
+          window.chatbase('open');
         }
-      });
+      } catch (e) {
+        console.log('Chatbase not ready yet');
+      }
     }
-    const onLoad=function(){
-      const script=document.createElement("script");
-      script.src="https://www.chatbase.co/embed.min.js";
-      script.id="xgDFFqw1jXeZaCSgZgIju"; /* deine Bot-ID – so lassen */
-      script.domain="www.chatbase.co";
-      document.body.appendChild(script);
-    };
-    if(document.readyState==="complete"){onLoad()}
-    else{window.addEventListener("load",onLoad)}
-  })();
   </script>
+
+<script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+
 </body>
 </html>
