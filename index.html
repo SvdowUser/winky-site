@@ -4,42 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Winky – Solana Safety Bot</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0b0b0b;
-      color: #fff;
-      font: 16px/1.5 system-ui, Segoe UI, Roboto, Arial;
-      text-align: center;
-    }
-    .wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 64px 20px;
-    }
-    h1 {
-      font-size: 40px;
-      margin: 12px 0 8px;
-    }
-    p {
-      opacity: 0.85;
-      font-size: 18px;
-    }
-    .btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 18px;
-      border: 1px solid #00ffff;
-      border-radius: 10px;
-      text-decoration: none;
-      color: #00ffff;
-      transition: 0.2s;
-    }
-    .btn:hover {
-      background: #00ffff;
-      color: #000;
-    }
-  </style>
+<style>
+  /* Standard-Launcher von Chatbase ausblenden (nur der Button, nicht das Fenster) */
+  .cb-bubble-launcher { display: none !important; }
+
+  /* Position des eigenen Launchers */
+  #winky-launcher {
+    position: fixed; right: 24px; bottom: 24px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #0f0f0f;
+    box-shadow: 0 8px 30px rgba(0,255,255,.25), inset 0 0 12px rgba(0,255,255,.1);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer; z-index: 99999;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  #winky-launcher:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(0,255,255,.35), inset 0 0 16px rgba(0,255,255,.14);
+  }
+
+  /* Augen */
+  .eyes { position: relative; width: 34px; height: 18px; }
+  .eye {
+    position:absolute; top:0; width:14px; height:18px; border-radius: 12px;
+    background:#fff; overflow:hidden;
+    animation: blink 5s infinite;
+  }
+  .eye.left  { left:0; }
+  .eye.right { right:0; }
+
+  /* Pupillen */
+  .pupil {
+    position:absolute; top:4px; left:4px; width:6px; height:6px;
+    background:#000; border-radius:50%;
+    animation: look 6s ease-in-out infinite;
+  }
+
+  /* Blinzeln (Deckel skaliert die Höhe) */
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    94% { transform: scaleY(.15); }
+    96% { transform: scaleY(1); }
+  }
+  /* Pupillen schauen leicht nach rechts/links */
+  @keyframes look {
+    0%, 40%   { transform: translateX(0); }
+    50%, 65%  { transform: translateX(2px); }
+    75%, 100% { transform: translateX(0); }
+  }
+
+  /* optional: kleiner „Schein“ unter dem Button */
+  #winky-shadow {
+    position: fixed; right: 32px; bottom: 18px; width: 48px; height: 10px;
+    border-radius: 50%; background: radial-gradient(ellipse, rgba(0,255,255,.25), rgba(0,0,0,0) 70%);
+    filter: blur(3px); z-index: 99998; pointer-events:none;
+  }
+</style>
 </head>
 
 <body>
