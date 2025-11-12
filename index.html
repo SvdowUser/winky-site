@@ -300,6 +300,22 @@
       color: var(--text-muted);
     }
 
+    /* 👀 Eye Animation */
+    .eye-anim {
+      display: inline-block;
+      animation: eyeBlink 4s infinite ease-in-out, eyeFloat 6s infinite ease-in-out;
+    }
+
+    @keyframes eyeBlink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      92% { transform: scaleY(0.15); }
+    }
+
+    @keyframes eyeFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
     @media (max-width: 720px) {
       .fees-grid {
         grid-template-columns: 1fr;
