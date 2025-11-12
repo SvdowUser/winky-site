@@ -299,121 +299,52 @@
       color: var(--text-muted);
     }
 
-    /* 👀 Eye Animation */
-    .eye-anim {
-      display: inline-block;
-      animation: eyeBlink 4s infinite ease-in-out, eyeFloat 6s infinite ease-in-out;
-    }
-
-    @keyframes eyeBlink {
-      0%, 90%, 100% { transform: scaleY(1); }
-      92% { transform: scaleY(0.15); }
-    }
-
-    @keyframes eyeFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-.winky-logo {
+      /* --- WINKY LOGO: zwei Pupillen, rechter Punkt zwinkert --- */
+    .winky-logo {
       --size: 80px;
-      position: relative;
-      width: var(--size);
-      height: var(--size);
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
+      gap: calc(var(--size) * 0.18);      /* Abstand zwischen den Augen */
     }
 
     /* kleine Version in der Navbar */
     .winky-logo--small {
-      --size: 32px;
+      --size: 28px;
     }
 
     /* große Version im Hero */
     .winky-logo--hero {
-      --size: 96px;
+      --size: 80px;
     }
 
-    /* Grundstil für alle Teile */
-    .winky-logo span {
-      position: absolute;
-    }
-
-    /* Pupillen – kleine runde Punkte */
+    /* Pupillen – zwei runde Punkte */
     .winky-eye {
-      width: calc(var(--size) * 0.18);
-      height: calc(var(--size) * 0.18);
+      width: calc(var(--size) * 0.38);
+      height: calc(var(--size) * 0.38);
       border-radius: 50%;
-      background: var(--accent);               /* Farbe der Pupille */
-      box-shadow: 0 0 10px var(--accent-soft); /* Glow */
+      background: var(--accent);          /* Farbe der Pupille */
+      box-shadow: 0 0 10px var(--accent-soft);
       transform-origin: center center;
     }
 
-    .winky-eye.left {
-      left: 30%;
-      top: 32%;
-    }
-
     .winky-eye.right {
-      right: 30%;
-      top: 32%;
       animation: winky-blink 10s infinite ease-in-out;
     }
 
-    /* Zwinker-Animation: wird kurz zu einer dünnen Linie */
+    /* Zwinker-Animation nur kurz alle ~10 Sekunden */
     @keyframes winky-blink {
-      /* normal rund */
-      0%, 91%, 100% {
+      0%, 92%, 100% {
         transform: scaleY(1) scaleX(1);
       }
-      /* Auge schließt */
-      93% {
+      94% {
         transform: scaleY(0.15) scaleX(1.25);
       }
-      /* wieder öffnen */
-      95% {
+      96% {
         transform: scaleY(1) scaleX(1);
       }
     }
 
-    /* einfacher Smile-Mund (kannst du lassen oder entfernen) */
-    .winky-mouth {
-      width: calc(var(--size) * 0.7);
-      height: calc(var(--size) * 0.7);
-      border-radius: 0 0 999px 999px;
-      border-bottom: calc(var(--size) * 0.11) solid #ffffff;
-      background: transparent;
-      bottom: 6%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* kleiner Funkelstern am rechten Auge (optional) */
-    .winky-sparkle {
-      --spark: calc(var(--size) * 0.18);
-      position: absolute;
-      width: var(--spark);
-      height: var(--spark);
-      top: 8%;
-      right: 16%;
-    }
-
-    .winky-sparkle::before,
-    .winky-sparkle::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100%;
-      height: 26%;
-      background: #ffffff;
-      border-radius: 999px;
-      transform: translate(-50%, -50%) rotate(45deg);
-    }
-
-    .winky-sparkle::after {
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
     @media (max-width: 720px) {
       .fees-grid {
         grid-template-columns: 1fr;
