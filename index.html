@@ -324,47 +324,59 @@
       justify-content: center;
     }
 
-    /* kleine Version oben im Navbar */
+    /* kleine Version in der Navbar */
     .winky-logo--small {
       --size: 32px;
     }
 
-    /* große Version im Hero-Bereich */
+    /* große Version im Hero */
     .winky-logo--hero {
       --size: 96px;
     }
 
+    /* Grundstil für alle Teile */
     .winky-logo span {
       position: absolute;
-      background: #ffffff;
-      border-radius: 999px;
     }
 
-    /* Augen */
+    /* Pupillen – kleine runde Punkte */
     .winky-eye {
-      width: calc(var(--size) * 0.16);
-      height: calc(var(--size) * 0.28);
+      width: calc(var(--size) * 0.18);
+      height: calc(var(--size) * 0.18);
+      border-radius: 50%;
+      background: var(--accent);               /* Farbe der Pupille */
+      box-shadow: 0 0 10px var(--accent-soft); /* Glow */
+      transform-origin: center center;
     }
 
     .winky-eye.left {
-      left: 26%;
+      left: 30%;
       top: 32%;
     }
 
     .winky-eye.right {
-      right: 26%;
+      right: 30%;
       top: 32%;
-      transform-origin: center center;
       animation: winky-blink 10s infinite ease-in-out;
     }
 
-    /* Zwinker-Animation – alle ~10s für einen kurzen Moment */
+    /* Zwinker-Animation: wird kurz zu einer dünnen Linie */
     @keyframes winky-blink {
-      0%, 92%, 100%   { transform: scaleY(1); }
-      94%, 96%        { transform: scaleY(0.12); }  /* Auge „zu“ */
+      /* normal rund */
+      0%, 91%, 100% {
+        transform: scaleY(1) scaleX(1);
+      }
+      /* Auge schließt */
+      93% {
+        transform: scaleY(0.15) scaleX(1.25);
+      }
+      /* wieder öffnen */
+      95% {
+        transform: scaleY(1) scaleX(1);
+      }
     }
 
-    /* Mund */
+    /* einfacher Smile-Mund (kannst du lassen oder entfernen) */
     .winky-mouth {
       width: calc(var(--size) * 0.7);
       height: calc(var(--size) * 0.7);
@@ -372,9 +384,11 @@
       border-bottom: calc(var(--size) * 0.11) solid #ffffff;
       background: transparent;
       bottom: 6%;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
-    /* Stern / Glitzer am rechten Auge */
+    /* kleiner Funkelstern am rechten Auge (optional) */
     .winky-sparkle {
       --spark: calc(var(--size) * 0.18);
       position: absolute;
@@ -382,7 +396,6 @@
       height: var(--spark);
       top: 8%;
       right: 16%;
-      background: transparent;
     }
 
     .winky-sparkle::before,
