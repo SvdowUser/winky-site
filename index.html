@@ -51,6 +51,7 @@
   </div>
 
   <!-- 💬 Winky Chatbase Widget -->
+    <!-- Winky Chat (Chatbase) -->
   <script>
   (function(){
     if(!window.chatbase || window.chatbase("getState")!=="initialized"){
@@ -63,14 +64,14 @@
           if(prop==="q"){return target.q}
           return(...args)=>target(prop,...args)
         }
-      })
+      });
     }
     const onLoad=function(){
       const script=document.createElement("script");
       script.src="https://www.chatbase.co/embed.min.js";
-      script.id="xgDFFqw1jXeZaCSgZgIju"; /* <- dein Bot-ID bleibt gleich */
+      script.id="xgDFFqw1jXeZaCSgZgIju"; /* deine Bot-ID – so lassen */
       script.domain="www.chatbase.co";
-      document.body.appendChild(script)
+      document.body.appendChild(script);
     };
     if(document.readyState==="complete"){onLoad()}
     else{window.addEventListener("load",onLoad)}
