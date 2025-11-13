@@ -1759,26 +1759,35 @@
     }
   </script>
 <script>
+
+
+ 
+
 <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+        <script>
+  // === Launch-Modal öffnen / schließen =======================
   function openLaunchModal() {
-    const modal = document.getElementById('launch-modal');
+    const modal        = document.getElementById('launch-modal');
     const walletStatus = document.getElementById('lm-wallet-status');
-    const walletBtn = document.getElementById('wallet-connect-btn');
+    const walletBtn    = document.getElementById('wallet-connect-btn');
 
     if (modal) {
       modal.style.display = 'flex';
     }
 
     if (walletStatus && walletBtn) {
-      const addr = walletBtn.dataset.address;
       const span = walletStatus.querySelector('span');
+      const addr = walletBtn.dataset.address;
+
       if (addr && span) {
         const short = addr.slice(0, 4) + '...' + addr.slice(-4);
         span.textContent = short;
-        span.style.color = 'var(--accent)';
+        span.style.color = '#00fff7';      // var(--accent)
       } else if (span) {
         span.textContent = 'not connected';
-        span.style.color = 'var(--text-muted)';
+        span.style.color = '#a3abb8';      // var(--text-muted)
       }
     }
   }
@@ -1790,6 +1799,7 @@
     }
   }
 
+  // === Submit im Launch-Modal (nur Vorschau) =================
   function handleLaunchModalSubmit(event) {
     event.preventDefault();
 
@@ -1799,7 +1809,7 @@
     const emoji  = document.getElementById('lm-emoji').value.trim();
     const desc   = document.getElementById('lm-desc').value.trim();
 
-    // Neuer Slider im Modal
+    // Slider im Modal (kannst du im HTML noch ergänzen, IDs: quick-fee-range & quick-fee-display)
     const quickFeeRange = document.getElementById('quick-fee-range');
     const totalFee = quickFeeRange ? parseFloat(quickFeeRange.value || '0') : 0;
     const halfFee  = totalFee / 2;
@@ -1835,42 +1845,16 @@
 
     closeLaunchModal();
   }
-</script>
 
-  <script>
-    // Simple fee slider: 0–10%, always 50/50 split
-    function updateFeeDisplay() {
-      const range = document.getElementById('fee-range');
-      const label = document.getElementById('fee-display');
-      if (!range || !label) return;
-
-      const total = parseFloat(range.value || '0');
-      const half = (total / 2).toFixed(1).replace('.0',''); // hübscher
-      const totalPretty = total.toFixed(1).replace('.0','');
-
-      label.textContent =
-        totalPretty + '% total · ' +
-        half + '% creator · ' +
-        half + '% prize pool';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const range = document.getElementById('fee-range');
-      if (!range) return;
-      range.addEventListener('input', updateFeeDisplay);
-      updateFeeDisplay();
-    });
-  </script>
-<script>
-  // Gleiche Logik für den Quick-Launch-Slider im Modal
-  function updateQuickFeeDisplay() {
-    const range = document.getElementById('quick-fee-range');
-    const label = document.getElementById('quick-fee-display');
+  // === Slider auf der Hauptseite (Launch fee per trade) ======
+  function updateFeeDisplay() {
+    const range = document.getElementById('fee-range');
+    const label = document.getElementById('fee-display');
     if (!range || !label) return;
 
-    const total = parseFloat(range.value || '0');
-    const half = (total / 2).toFixed(1).replace('.0','');
-    const totalPretty = total.toFixed(1).replace('.0','');
+    const total       = parseFloat(range.value || '0');
+    const half        = (total / 2).toFixed(1).replace('.0', '');
+    const totalPretty = total.toFixed(1).replace('.0', '');
 
     label.textContent =
       totalPretty + '% total · ' +
@@ -1878,17 +1862,38 @@
       half + '% prize pool';
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  // === Slider im Modal (Quick launch) ========================
+  function updateQuickFeeDisplay() {
     const range = document.getElementById('quick-fee-range');
-    if (!range) return;
-    range.addEventListener('input', updateQuickFeeDisplay);
-    updateQuickFeeDisplay();
+    const label = document.getElementById('quick-fee-display');
+    if (!range || !label) return;
+
+    const total       = parseFloat(range.value || '0');
+    const half        = (total / 2).toFixed(1).replace('.0', '');
+    const totalPretty = total.toFixed(1).replace('.0', '');
+
+    label.textContent =
+      totalPretty + '% total · ' +
+      half + '% creator · ' +
+      half + '% prize pool';
+  }
+
+  // === Initialisieren, sobald DOM geladen ist ===============
+  document.addEventListener('DOMContentLoaded', function () {
+    const mainRange = document.getElementById('fee-range');
+    if (mainRange) {
+      mainRange.addEventListener('input', updateFeeDisplay);
+      updateFeeDisplay();
+    }
+
+    const quickRange = document.getElementById('quick-fee-range');
+    if (quickRange) {
+      quickRange.addEventListener('input', updateQuickFeeDisplay);
+      updateQuickFeeDisplay();
+    }
   });
 </script>
 
-<script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
 
 </body>
 </html>
