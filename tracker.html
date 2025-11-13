@@ -389,19 +389,18 @@
   // CONFIG
   // ==============================
 
-  // Deine Worker-URL (ohne Slash am Ende!)
+  // Deine Worker-URL (ohne / am Ende):
   const WORKER_URL = "https://misty-king-27f4.christopher-milosch.workers.dev";
 
-  // Birdeye: max 20 pro Request
-  const PAGE_SIZE = 20;
-
-  // Wir holen 3 Seiten: Top 60 (0–19, 20–39, 40–59)
-  const OFFSETS = [0, 20, 40];
+  // Wie viele Tokens willst du insgesamt ungefähr?
+  const TOTAL_DESIRED = 80;          // z.B. 80
+  const PAGE_LIMIT    = 20;          // Birdeye erlaubt max. 20 pro Request
+  const PAGES         = Math.ceil(TOTAL_DESIRED / PAGE_LIMIT); // also 4 Seiten
 
   let cachedTokens = [];
 
   // ==============================
-  // Helper: Format & Risk
+  // Helper: formatting & risk
   // ==============================
 
   function formatUsd(num) {
@@ -415,30 +414,22 @@
     return "$" + n.toFixed(6);
   }
 
-  // Neue Heuristik:
-  // richtig große, liquide Coins -> safe
-  // mittlere -> medium
-  // alles kleine illiquide -> high
+  // bessere Risk-Heuristik (sehr grob, aber nicht alles "high")
   function computeRiskScore(marketCap, volume24h, liquidityUsd) {
     marketCap    = marketCap    || 0;
     volume24h    = volume24h    || 0;
     liquidityUsd = liquidityUsd || 0;
 
-    // SAFE: fette Coins wie JUP, WETH, WBTC, RAY usw.
-    if (liquidityUsd >= 5_000_000 &&
-        marketCap    >= 100_000_000 &&
-        volume24h    >= 5_000_000) {
-      return 1; // safe
-    }
+    // Große Caps/Liquidity => safe
+    if (marketCap >= 500_000_000 && liquidityUsd >= 10_000_000) return 1; // safe
+    if (marketCap >= 200_000_000 && liquidityUsd >= 5_000_000 && volume24h >= 5_000_000) return 1;
+    if (liquidityUsd >= 5_000_000 && volume24h >= 10_000_000) return 1;
 
-    // MEDIUM: brauchbare Zahlen
-    if (liquidityUsd >= 500_000 &&
-        marketCap    >= 5_000_000 &&
-        volume24h    >= 500_000) {
-      return 2; // medium
-    }
+    // Mittelgroße Caps => medium
+    if (marketCap >= 20_000_000 && liquidityUsd >= 1_000_000 && volume24h >= 1_000_000) return 2;
+    if (marketCap >= 5_000_000 && liquidityUsd >= 300_000 && volume24h >= 300_000) return 2;
 
-    // Rest: high risk
+    // Rest: high
     return 3;
   }
 
@@ -454,35 +445,23 @@
     return "risk-high";
   }
 
-  // Birdeye → internes Token-Objekt
-  function mapBirdeyeToken(item, index) {
-    const liquidityUsd = typeof item.liquidity === "number" ? item.liquidity : 0;
-    const marketCap    = item.marketcap || item.marketCapUsd || item.fdv || 0;
-    const volume24h    = item.volume24hUSD || item.volumeH24Usd || 0;
-    const priceUsd     = item.price || item.priceUsd || 0;
+  // ==============================
+  // Fetch von mehreren Seiten über den Worker
+  // ==============================
 
-    const riskScore = computeRiskScore(marketCap, volume24h, liquidityUsd);
+  async function fetchPage(offset) {
+    const url = `${WORKER_URL}?limit=${PAGE_LIMIT}&offset=${offset}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Worker HTTP " + res.status);
+    const json = await res.json();
+    if (!json.success) {
+      throw new Error("Worker returned error: " + (json.message || "unknown"));
+    }
 
-    return {
-      name:   item.name   || "Unknown",
-      symbol: item.symbol || "?",
-      chain:  "solana",
-      marketCap,
-      volume24h,
-      priceUsd,
-      liquidityUsd,
-      riskScore,
-      riskLabel: riskLabel(riskScore),
-      dexUrl: `https://birdeye.so/token/${item.address}?chain=solana`,
-      fromWinky: false,
-      imageUrl: item.logoURI || null,
-      originalRank: item.rank != null ? item.rank : index
-    };
+    // Struktur: { success, status, data: { data: { tokens: [...] } } }
+    const tokens = json.data?.data?.tokens || [];
+    return tokens;
   }
-
-  // ==============================
-  // Load from Worker (mehrere Seiten + Duplikate filtern)
-  // ==============================
 
   async function loadTokens() {
     const tbody = document.getElementById("token-rows");
@@ -490,44 +469,122 @@
       '<tr class="table-message-row"><td colspan="8">Loading live data from Birdeye…</td></tr>';
 
     try {
-      // mehrere Requests parallel an den gleichen Worker
-      const responses = await Promise.all(
-        OFFSETS.map(offset =>
-          fetch(`${WORKER_URL}?limit=${PAGE_SIZE}&offset=${offset}`)
-            .then(r => r.json())
-        )
-      );
-
-      const allRaw = [];
-
-      for (const res of responses) {
-        if (!res || !res.success || !res.data) continue;
-        const inner = res.data;
-
-        const tokensArr =
-          inner.data && Array.isArray(inner.data.tokens)
-            ? inner.data.tokens
-            : [];
-
-        allRaw.push(...tokensArr);
+      // mehrere Seiten parallel laden: offset 0,20,40,60,...
+      const pagePromises = [];
+      for (let i = 0; i < PAGES; i++) {
+        const offset = i * PAGE_LIMIT;
+        pagePromises.push(fetchPage(offset));
       }
 
-      if (!allRaw.length) {
-        throw new Error("No tokens from worker");
-      }
+      const pageResults = await Promise.all(pagePromises);
+      const allRaw = pageResults.flat(); // alles in ein Array
 
-      // ✅ Duplikate nach address entfernen
-      const seen = new Set();
-      const mapped = [];
-
+      // Deduplizieren nach address (falls Token auf mehreren Seiten ist)
+      const byAddress = new Map();
       for (const item of allRaw) {
-        if (!item.address) continue;
-        if (seen.has(item.address)) continue;
-        seen.add(item.address);
-        mapped.push(mapBirdeyeToken(item, mapped.length));
+        const address = item.address || item.mint || item.tokenAddress;
+        if (!address) continue;
+
+        if (!byAddress.has(address)) {
+          byAddress.set(address, item);
+        } else {
+          // optional: besten Rank behalten (kleinste rank-Zahl)
+          const existing = byAddress.get(address);
+          const rNew = typeof item.rank === "number" ? item.rank : 999999;
+          const rOld = typeof existing.rank === "number" ? existing.rank : 999999;
+          if (rNew < rOld) {
+            byAddress.set(address, item);
+          }
+        }
       }
 
-      cachedTokens = mapped;
+      const uniqueItems = Array.from(byAddress.values());
+
+      const tokens = uniqueItems.map((item) => {
+        const name =
+          item.name ||
+          item.tokenName ||
+          (item.info && item.info.name) ||
+          "Unknown";
+
+        const symbol =
+          item.symbol ||
+          item.ticker ||
+          (item.info && item.info.symbol) ||
+          (name ? name.slice(0, 4).toUpperCase() : "?");
+
+        const chain =
+          item.chain ||
+          item.chainId ||
+          item.network ||
+          "solana";
+
+        const address =
+          item.address ||
+          item.mint ||
+          item.tokenAddress ||
+          (item.info && item.info.address) ||
+          "";
+
+        const imageUrl =
+          item.logoURI ||
+          item.logoUrl ||
+          item.imageUrl ||
+          (item.info && item.info.imageUrl) ||
+          null;
+
+        const marketCap =
+          item.marketcap ||
+          item.marketCapUsd ||
+          item.market_cap ||
+          item.fdvUsd ||
+          item.fdv ||
+          0;
+
+        const volume24h =
+          item.volume24hUSD ||
+          item.volumeH24Usd ||
+          item.v24hUsd ||
+          item.volume24h ||
+          (item.volume && (item.volume.h24 || item.volume["24h"])) ||
+          0;
+
+        const liquidityUsd =
+          item.liquidity ||
+          item.liquidityUsd ||
+          (item.liquidity && (item.liquidity.usd || item.liquidity.USD)) ||
+          0;
+
+        const priceUsd =
+          item.price ||
+          item.priceUsd ||
+          (item.marketData && item.marketData.priceUsd) ||
+          0;
+
+        const riskScore = computeRiskScore(marketCap, volume24h, liquidityUsd);
+
+        const dexUrl = address
+          ? `https://birdeye.so/token/${address}?chain=${chain || "solana"}`
+          : "https://birdeye.so";
+
+        return {
+          name,
+          symbol,
+          chain,
+          marketCap,
+          volume24h,
+          priceUsd,
+          liquidityUsd,
+          riskScore,
+          riskLabel: riskLabel(riskScore),
+          dexUrl,
+          fromWinky: false,        // später: echte Winky-Launches markieren
+          imageUrl,
+          originalRank: item.rank ?? 999999,
+        };
+      });
+
+      cachedTokens = tokens;
       applyFiltersAndRender();
     } catch (err) {
       console.error("Birdeye load failed:", err);
@@ -537,11 +594,11 @@
   }
 
   // ==============================
-  // Render + Filter (wie vorher)
+  // Render + Filter
   // ==============================
 
   function applyFiltersAndRender() {
-    const tbody      = document.getElementById("token-rows");
+    const tbody = document.getElementById("token-rows");
     const search     = (document.getElementById("search").value || "").trim().toLowerCase();
     const riskFilter = document.getElementById("filter-risk").value;
     const mcapFilter = document.getElementById("filter-mcap").value;
@@ -550,7 +607,7 @@
 
     // Suche
     if (search) {
-      list = list.filter(t =>
+      list = list.filter((t) =>
         t.name.toLowerCase().includes(search) ||
         t.symbol.toLowerCase().includes(search)
       );
@@ -558,15 +615,15 @@
 
     // Risk-Filter
     if (riskFilter === "safe") {
-      list = list.filter(t => t.riskScore === 1);
+      list = list.filter((t) => t.riskScore === 1);
     } else if (riskFilter === "medium") {
-      list = list.filter(t => t.riskScore === 2);
+      list = list.filter((t) => t.riskScore === 2);
     } else if (riskFilter === "high") {
-      list = list.filter(t => t.riskScore === 3);
+      list = list.filter((t) => t.riskScore === 3);
     }
 
     // Marketcap-Filter
-    list = list.filter(t => {
+    list = list.filter((t) => {
       const mc = t.marketCap || 0;
       if (mcapFilter === "small") return mc > 0 && mc < 1_000_000;
       if (mcapFilter === "mid")   return mc >= 1_000_000 && mc <= 10_000_000;
@@ -574,7 +631,7 @@
       return true;
     });
 
-    // Sortierung: safe → medium → high, danach Birdeye-Rank
+    // Sortierung: zuerst safe → medium → high, dann nach Birdeye-Rank (kleiner = besser)
     list.sort((a, b) => {
       if (a.riskScore !== b.riskScore) return a.riskScore - b.riskScore;
       return a.originalRank - b.originalRank;
@@ -586,7 +643,7 @@
       return;
     }
 
-    const rows = list.map(t => {
+    const rows = list.map((t) => {
       const logo = t.imageUrl
         ? `<div class="token-logo"><img src="${t.imageUrl}" alt=""></div>`
         : `<div class="token-logo">${(t.symbol || "?")[0]}</div>`;
@@ -629,7 +686,7 @@
   }
 
   // ==============================
-  // Init – nur EINMAL laden, kein Auto-Refresh mehr
+  // Init
   // ==============================
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -637,8 +694,8 @@
     document.getElementById("filter-risk").addEventListener("change", applyFiltersAndRender);
     document.getElementById("filter-mcap").addEventListener("change", applyFiltersAndRender);
 
-    loadTokens();  // nur beim ersten Laden
-    // KEIN setInterval mehr → Coins bleiben, Suche findet sie weiter
+    loadTokens();           // einmal beim Laden
+    // KEIN setInterval mehr -> Liste bleibt stabil, bis du neu lädst
   });
 </script>
 
