@@ -728,6 +728,139 @@
       color: var(--accent);
       font-weight: 600;
     }
+    /* --- LAUNCH MODAL --- */
+    .launch-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      display: none;             /* wird per JS auf flex gesetzt */
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .launch-modal {
+      width: 100%;
+      max-width: 440px;
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.18), var(--card));
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      padding: 18px 18px 16px;
+      position: relative;
+    }
+
+    .launch-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .launch-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 4px 0 6px;
+    }
+
+    .launch-modal-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 0 10px;
+    }
+
+    .launch-modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .lm-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .lm-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .lm-input,
+    .lm-textarea {
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.35);
+      padding: 8px 10px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .lm-input::placeholder,
+    .lm-textarea::placeholder {
+      color: rgba(163,171,184,0.7);
+    }
+
+    .lm-input:focus,
+    .lm-textarea:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 10px var(--accent-soft);
+    }
+
+    .lm-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .lm-fee {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .lm-fee input {
+      max-width: 60px;
+      text-align: right;
+    }
+
+    .lm-wallet-status {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .lm-wallet-status strong {
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .launch-modal-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .launch-modal-note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -812,14 +945,15 @@
         transparency and simple UX.
       </p>
 
-    <div class="hero-buttons">
-  <a class="btn btn-primary" href="#launch">
+   <div class="hero-buttons">
+  <button class="btn btn-primary" type="button" onclick="openLaunchModal()">
     Launch with Winky<span>→</span>
-  </a>
+  </button>
   <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
     Open chat<span>→</span>
   </button>
 </div>
+
 
     </section>
 
@@ -1337,6 +1471,115 @@
       </section>
 
     </div> <!-- /page -->
+          <!-- LAUNCH MODAL -->
+  <div id="launch-modal" class="launch-modal-backdrop">
+    <div class="launch-modal">
+      <button class="launch-modal-close" type="button" onclick="closeLaunchModal()">×</button>
+
+      <div class="section-label">Quick launch</div>
+      <h2 class="launch-modal-title">Set up your meme token</h2>
+      <p class="launch-modal-sub">
+        This is a preview of the launch flow Winky will support. No real tokens are created yet.
+      </p>
+
+      <form class="launch-modal-form" onsubmit="handleLaunchModalSubmit(event)">
+        <div class="lm-field">
+          <span class="lm-label">Token name</span>
+          <input
+            id="lm-name"
+            class="lm-input"
+            type="text"
+            placeholder="Winky The Watcher"
+            required
+          />
+        </div>
+
+        <div class="lm-field">
+          <span class="lm-label">Ticker</span>
+          <input
+            id="lm-ticker"
+            class="lm-input"
+            type="text"
+            placeholder="WINKY"
+            maxlength="8"
+            required
+          />
+        </div>
+
+        <div class="lm-field">
+          <span class="lm-label">Total supply</span>
+          <input
+            id="lm-supply"
+            class="lm-input"
+            type="text"
+            placeholder="1 000 000 000"
+            required
+          />
+        </div>
+
+        <div class="lm-field">
+          <span class="lm-label">Vibe / emoji (optional)</span>
+          <input
+            id="lm-emoji"
+            class="lm-input"
+            type="text"
+            placeholder="👀✨"
+          />
+        </div>
+
+        <div class="lm-field">
+          <span class="lm-label">Short description</span>
+          <textarea
+            id="lm-desc"
+            class="lm-textarea"
+            rows="3"
+            placeholder="The AI watcher that helps you launch safer Solana memes."
+          ></textarea>
+        </div>
+
+        <div class="lm-row">
+          <div class="lm-fee">
+            <span class="lm-label">Creator fee</span>
+            <input
+              id="lm-fee-creator"
+              class="lm-input"
+              type="number"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span>%</span>
+          </div>
+          <div class="lm-fee">
+            <span class="lm-label">Treasury fee</span>
+            <input
+              id="lm-fee-treasury"
+              class="lm-input"
+              type="number"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <span>%</span>
+          </div>
+        </div>
+
+        <div id="lm-wallet-status" class="lm-wallet-status">
+          Wallet: <span>not connected</span>
+        </div>
+
+        <div class="launch-modal-actions">
+          <button class="btn btn-primary" type="submit">
+            Preview launch config<span>→</span>
+          </button>
+          <p class="launch-modal-note">
+            Idea: ~2 USD fee per launch, split between creator & Winky treasury.
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
   </main>
 
 
@@ -1422,6 +1665,81 @@
       );
     }
   </script>
+<script>
+  function openLaunchModal() {
+    const modal = document.getElementById('launch-modal');
+    const walletStatus = document.getElementById('lm-wallet-status');
+    const walletBtn = document.getElementById('wallet-connect-btn');
+
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+
+    if (walletStatus && walletBtn) {
+      const addr = walletBtn.dataset.address;
+      const span = walletStatus.querySelector('span');
+      if (addr && span) {
+        const short = addr.slice(0, 4) + '...' + addr.slice(-4);
+        span.textContent = short;
+        span.style.color = 'var(--accent)';
+      } else if (span) {
+        span.textContent = 'not connected';
+        span.style.color = 'var(--text-muted)';
+      }
+    }
+  }
+
+  function closeLaunchModal() {
+    const modal = document.getElementById('launch-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function handleLaunchModalSubmit(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('lm-name').value.trim() || 'Unnamed token';
+    const ticker = (document.getElementById('lm-ticker').value || '').trim().toUpperCase();
+    const supply = document.getElementById('lm-supply').value.trim() || 'not set';
+    const emoji = document.getElementById('lm-emoji').value.trim();
+    const desc  = document.getElementById('lm-desc').value.trim();
+    const feeCreator  = document.getElementById('lm-fee-creator').value || '0';
+    const feeTreasury = document.getElementById('lm-fee-treasury').value || '0';
+
+    const walletBtn = document.getElementById('wallet-connect-btn');
+    const creatorAddress = walletBtn && walletBtn.dataset.address
+      ? walletBtn.dataset.address
+      : null;
+
+    const data = {
+      name,
+      symbol: ticker,
+      supply,
+      emoji,
+      description: desc,
+      creator: creatorAddress,
+      network: 'solana',
+      mintType: 'meme-token',
+      feeModel: {
+        launchFeeUsd: 2,
+        split: {
+          creator: Number(feeCreator),
+          treasury: Number(feeTreasury)
+        }
+      },
+      createdAt: new Date().toISOString()
+    };
+
+    // Erstmal nur Vorschau – später kann das zu Backend / Smart Contract gehen.
+    alert(
+      'Launch preview (UI only):\\n\\n' +
+      JSON.stringify(data, null, 2)
+    );
+
+    closeLaunchModal();
+  }
+</script>
 
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
