@@ -392,10 +392,8 @@
   // Deine Worker-URL (ohne / am Ende!)
   const WORKER_URL = "https://misty-king-27f4.christopher-milosch.workers.dev";
 
-  // Wie viele Tokens möchtest du ungefähr insgesamt anzeigen?
-  const TOTAL_DESIRED = 80;     // z.B. 80
-  const PAGE_LIMIT    = 20;     // Birdeye erlaubt max. 20 pro Request
-  const PAGES         = Math.ceil(TOTAL_DESIRED / PAGE_LIMIT); // also 4 Seiten: 0,20,40,60
+  // Birdeye erlaubt max. 20 pro Request → 1 Page
+  const LIMIT = 20;
 
   let cachedTokens = [];
 
@@ -414,22 +412,30 @@
     return "$" + n.toFixed(6);
   }
 
-  // bessere Risk-Heuristik (sehr grob, aber große Coins wie JUP nicht mehr immer "high")
+  // Risk-Heuristik: große Caps & viel Liquidity = safe; Midcaps = medium; Rest = high
   function computeRiskScore(marketCap, volume24h, liquidityUsd) {
     marketCap    = marketCap    || 0;
     volume24h    = volume24h    || 0;
     liquidityUsd = liquidityUsd || 0;
 
-    // Big Boys -> safe
-    if (marketCap >= 500_000_000 && liquidityUsd >= 10_000_000) return 1;
-    if (marketCap >= 200_000_000 && liquidityUsd >= 5_000_000 && volume24h >= 5_000_000) return 1;
-    if (liquidityUsd >= 5_000_000 && volume24h >= 10_000_000) return 1;
+    // Große, etablierte Tokens → safe
+    if (
+      (marketCap >= 1_000_000_000 && liquidityUsd >= 1_000_000) ||   // >1B Mcap mit ordentlicher Liquidity
+      (marketCap >= 300_000_000 && liquidityUsd >= 5_000_000 && volume24h >= 5_000_000) ||
+      (liquidityUsd >= 25_000_000 && volume24h >= 25_000_000)
+    ) {
+      return 1; // safe
+    }
 
-    // Mid Caps -> medium
-    if (marketCap >= 20_000_000 && liquidityUsd >= 1_000_000 && volume24h >= 1_000_000) return 2;
-    if (marketCap >= 5_000_000 && liquidityUsd >= 300_000 && volume24h >= 300_000) return 2;
+    // Midcaps → medium
+    if (
+      (marketCap >= 20_000_000 && liquidityUsd >= 1_000_000 && volume24h >= 1_000_000) ||
+      (marketCap >= 5_000_000 && liquidityUsd >= 300_000 && volume24h >= 300_000)
+    ) {
+      return 2; // medium
+    }
 
-    // Rest -> high
+    // Alles darunter → high
     return 3;
   }
 
@@ -446,28 +452,8 @@
   }
 
   // ==============================
-  // Fetch von mehreren Seiten über den Worker
+  // Fetch von Worker (Birdeye Proxy)
   // ==============================
-
-  async function fetchPage(offset) {
-    const url = `${WORKER_URL}?limit=${PAGE_LIMIT}&offset=${offset}`;
-    console.log("Fetching page offset", offset, "→", url);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Worker HTTP " + res.status);
-    const json = await res.json();
-    if (!json.success) {
-      throw new Error("Worker returned error: " + (json.message || "unknown"));
-    }
-
-    // Struktur laut deinem Screenshot:
-    // { success:true, status:200, data:{ data:{ tokens:[...], total:1000 }, success:true } }
-    const tokens = json.data && json.data.data && Array.isArray(json.data.data.tokens)
-      ? json.data.data.tokens
-      : [];
-
-    console.log("Page offset", offset, "got", tokens.length, "tokens");
-    return tokens;
-  }
 
   async function loadTokens() {
     const tbody = document.getElementById("token-rows");
@@ -475,54 +461,42 @@
       '<tr class="table-message-row"><td colspan="8">Loading live data from Birdeye…</td></tr>';
 
     try {
-      // mehrere Seiten parallel laden: 0,20,40,60,...
-      const pagePromises = [];
-      for (let i = 0; i < PAGES; i++) {
-        const offset = i * PAGE_LIMIT;
-        pagePromises.push(fetchPage(offset));
+      const url = `${WORKER_URL}?limit=${LIMIT}&offset=0`;
+      console.log("Fetching from Worker:", url);
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Worker HTTP " + res.status);
       }
 
-      const pageResults = await Promise.all(pagePromises);
-      const allRaw = pageResults.flat();
-      console.log("Total raw tokens from all pages:", allRaw.length);
+      const json = await res.json();
+      console.log("Worker response:", json);
 
-      // Deduplizieren nach address
-      const byAddress = new Map();
-      for (const item of allRaw) {
-        const address = item.address || item.mint || item.tokenAddress;
-        if (!address) continue;
-
-        if (!byAddress.has(address)) {
-          byAddress.set(address, item);
-        } else {
-          // falls Rank existiert -> den mit besserem Rank behalten
-          const existing = byAddress.get(address);
-          const rNew = typeof item.rank === "number" ? item.rank : 999999;
-          const rOld = typeof existing.rank === "number" ? existing.rank : 999999;
-          if (rNew < rOld) {
-            byAddress.set(address, item);
-          }
-        }
+      if (!json.success) {
+        throw new Error(json.message || "Worker returned success=false");
       }
 
-      const uniqueItems = Array.from(byAddress.values());
-      console.log("Unique tokens after dedupe:", uniqueItems.length);
+      // Struktur laut deinem letzten Screenshot:
+      // { success:true, status:200, data:{ data:{ tokens:[...], total:1000 }, success:true } }
+      const tokensArr =
+        json.data &&
+        json.data.data &&
+        Array.isArray(json.data.data.tokens)
+          ? json.data.data.tokens
+          : [];
 
-      const tokens = uniqueItems.map((item) => {
-        // Struktur genau nach deinem Birdeye-JSON:
+      if (!tokensArr.length) {
+        throw new Error("No tokens in response");
+      }
+
+      const tokens = tokensArr.map((item) => {
         const name   = item.name   || "Unknown";
         const symbol = item.symbol || (name ? name.slice(0, 4).toUpperCase() : "?");
         const chain  = "solana"; // Worker setzt x-chain=solana
 
-        const address = item.address || "";
-
-        const imageUrl = item.logoURI || null;
-
-        const marketCap =
-          item.marketcap != null
-            ? item.marketcap
-            : (item.fdv != null ? item.fdv : 0);
-
+        const address   = item.address || "";
+        const imageUrl  = item.logoURI || null;
+        const marketCap = (item.marketcap != null ? item.marketcap : (item.fdv || 0));
         const volume24h = item.volume24hUSD || 0;
         const liquidityUsd = item.liquidity || 0;
         const priceUsd = item.price || 0;
@@ -554,7 +528,6 @@
       applyFiltersAndRender();
     } catch (err) {
       console.error("Birdeye load failed:", err);
-      const tbody = document.getElementById("token-rows");
       tbody.innerHTML =
         '<tr class="table-message-row"><td colspan="8">Failed to load data from Birdeye. ' +
         (err && err.message ? err.message : "") +
@@ -600,7 +573,7 @@
       return true;
     });
 
-    // Sortierung: erst safe → medium → high, dann rank (1 = top)
+    // Sortierung: safe → medium → high, dann rank (1 = top)
     list.sort((a, b) => {
       if (a.riskScore !== b.riskScore) return a.riskScore - b.riskScore;
       return a.originalRank - b.originalRank;
@@ -663,9 +636,11 @@
     document.getElementById("filter-risk").addEventListener("change", applyFiltersAndRender);
     document.getElementById("filter-mcap").addEventListener("change", applyFiltersAndRender);
 
-    loadTokens(); // einmal beim Laden – kein setInterval, damit die Liste stabil bleibt
+    // nur 1x beim Laden, KEIN setInterval → weniger 429
+    loadTokens();
   });
 </script>
+
 
 
 </body>
