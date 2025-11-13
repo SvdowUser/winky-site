@@ -352,17 +352,27 @@
   }
 }
 
-    .faq-list {
-      margin-top: 12px;
+        .faq-list {
+      margin-top: 20px;
       max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .faq-list details {
       background: var(--card);
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.06);
-      padding: 10px 14px;
-      margin-bottom: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+    }
+
+    .faq-list details:hover {
+      background: rgba(255,255,255,0.02);
     }
 
     .faq-list summary {
@@ -371,19 +381,41 @@
       font-size: 14px;
       font-weight: 500;
       color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      user-select: none;
     }
 
     .faq-list summary::-webkit-details-marker {
       display: none;
     }
 
+    /* + / − Icon rechts */
+    .faq-list summary::after {
+      content: "+";
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition:
+        transform .15s ease,
+        color .15s ease;
+    }
+
+    .faq-list details[open] summary::after {
+      content: "−";
+      color: var(--accent);
+      transform: rotate(180deg);
+    }
+
     .faq-list details[open] {
       border-color: var(--accent-soft);
-      box-shadow: 0 0 12px var(--accent-soft);
+      box-shadow: 0 0 14px var(--accent-soft);
     }
 
     .faq-list details p {
-      margin: 8px 0 4px;
+      margin: 10px 0 4px;
       font-size: 14px;
       color: var(--text-muted);
     }
@@ -660,7 +692,6 @@
           </article>
         </div>
       </section>
-    </div>
           <!-- FAQ -->
       <section id="faq">
         <div class="section-label">FAQ</div>
@@ -720,8 +751,6 @@
         </div>
       </section>
     </div>
-  </main>
-
   </main>
 
   <!-- FOOTER -->
