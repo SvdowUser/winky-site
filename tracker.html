@@ -177,6 +177,12 @@
       text-align: left;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
+/* etwas extra Platz für die Buttons in der letzten Spalte,
+   damit der runde Rand nicht vom Wrapper abgeschnitten wird */
+th:last-child,
+td:last-child {
+  padding-right: 24px;
+}
 
     th {
       font-size: 11px;
@@ -268,6 +274,7 @@
       align-items: center;
       justify-content: center;
       white-space: nowrap;
+      margin-right: 2px; /* NEU: kleiner Abstand nach rechts */
     }
 
     .btn-xs:hover { background: rgba(255,255,255,0.06); }
