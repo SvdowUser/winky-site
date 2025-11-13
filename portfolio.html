@@ -1,21 +1,196 @@
-<header class="nav">
-  <div class="nav-left">
-    <div class="nav-dots">
-      <span class="nav-dot"></span>
-      <span class="nav-dot"></span>
-    </div>
-    <span class="nav-brand">Winky</span>
-  </div>
-  <nav class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="portfolio.html">Portfolio</a> <!-- NEU -->
-    <a href="tracker.html" class="active">Token tracker</a>
-  </nav>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Winky – Portfolio</title>
+  <style>
+    /* du kannst hier einfach deine Styles aus tracker.html reinkopieren,
+       vor allem :root, body, .nav, .page usw. */
 
-  <!-- Wallet-Connect -->
-  <button id="connect-wallet-btn" class="btn-xs">
-    Connect wallet
-  </button>
-  <span id="wallet-address-label" style="font-size:11px;color:#a3abb8;margin-left:8px;"></span>
-</header>
+    :root {
+      --bg: #050608;
+      --card: #0b0f14;
+      --accent: #00fff7;
+      --accent-soft: rgba(0,255,247,0.12);
+      --text-main: #f7f7f7;
+      --text-muted: #a3abb8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top, #07121c 0, var(--bg) 55%);
+      color: var(--text-main);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .nav {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 20px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-dots { display: flex; gap: 4px; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); }
+    .nav-links a { margin-left: 18px; color: var(--text-muted); font-weight: 500; }
+    .nav-links a.active { color: var(--accent); }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto 80px;
+      padding: 0 20px 80px;
+    }
+    section { margin-top: 32px; }
+    .section-label {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .section-title { font-size: 26px; margin: 0 0 10px; }
+    .section-text { margin: 0 0 20px; color: var(--text-muted); font-size: 15px; max-width: 640px; }
+
+    .card {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .btn-xs {
+      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.6);
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+    .btn-xs:hover { background: rgba(255,255,255,0.06); }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-dots">
+        <span class="nav-dot"></span>
+        <span class="nav-dot"></span>
+      </div>
+      <span class="nav-brand">Winky</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="portfolio.html" class="active">Portfolio</a>
+      <a href="tracker.html">Token tracker</a>
+    </nav>
+
+    <button id="connect-wallet-btn" class="btn-xs">Connect wallet</button>
+    <span id="wallet-address-label" style="font-size:11px;color:#a3abb8;margin-left:8px;"></span>
+  </header>
+
+  <main class="page">
+    <section>
+      <div class="section-label">Portfolio</div>
+      <h1 class="section-title">Your Solana wallet</h1>
+      <p class="section-text">
+        Connect your wallet to see a simple overview of your tokens.  
+        (In der nächsten Ausbaustufe lesen wir hier echte Balances aus.)
+      </p>
+
+      <div class="card">
+        <p style="margin-top:0;">
+          <strong>Connected wallet:</strong>
+          <span id="portfolio-address" style="color:var(--accent);margin-left:4px;">not connected</span>
+        </p>
+        <p id="portfolio-hint" style="font-size:13px;color:var(--text-muted);margin-bottom:0;">
+          Please connect your wallet in the header.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- dieselben Wallet-Helper wie auf tracker.html -->
+  <script>
+    function shortenAddress(addr) {
+      if (!addr) return "";
+      return addr.slice(0, 4) + "..." + addr.slice(-4);
+    }
+
+    async function connectWallet() {
+      const btn   = document.getElementById("connect-wallet-btn");
+      const label = document.getElementById("wallet-address-label");
+
+      if (!window.solana || !window.solana.isPhantom) {
+        alert("Phantom Wallet nicht gefunden. Bitte Phantom installieren.");
+        window.open("https://phantom.app/", "_blank");
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Connecting…";
+        const resp = await window.solana.connect();
+        const pubkey = resp.publicKey.toString();
+
+        localStorage.setItem("winky_wallet", pubkey);
+
+        btn.textContent = "Connected";
+        label.textContent = shortenAddress(pubkey);
+        updatePortfolioAddress(pubkey);
+      } catch (err) {
+        console.error("Wallet connect error:", err);
+        btn.textContent = "Connect wallet";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function updatePortfolioAddress(addr) {
+      const el = document.getElementById("portfolio-address");
+      const hint = document.getElementById("portfolio-hint");
+      if (!el) return;
+      if (addr) {
+        el.textContent = addr;
+        hint.textContent = "Portfolio-Ansicht kommt als nächstes – Balances, Gesamtwert, usw.";
+      } else {
+        el.textContent = "not connected";
+        hint.textContent = "Please connect your wallet in the header.";
+      }
+    }
+
+    function initWalletUi() {
+      const btn   = document.getElementById("connect-wallet-btn");
+      const label = document.getElementById("wallet-address-label");
+      if (!btn) return;
+
+      btn.addEventListener("click", connectWallet);
+
+      const saved = localStorage.getItem("winky_wallet");
+      if (saved) {
+        btn.textContent = "Connected";
+        label.textContent = shortenAddress(saved);
+        updatePortfolioAddress(saved);
+      } else {
+        updatePortfolioAddress(null);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", initWalletUi);
+  </script>
+</body>
+</html>
