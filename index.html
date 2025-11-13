@@ -1627,31 +1627,34 @@
           ></textarea>
         </div>
 
-        <div class="lm-row">
-          <div class="lm-fee">
-            <span class="lm-label">Creator fee</span>
-            <input
-              id="lm-fee-creator"
-              class="lm-input"
-              type="number"
-              min="0"
-              max="100"
-              value="50"
-            />
-            <span>%</span>
+               <!-- Einfacher Fee-Slider im Quick-Launch -->
+        <div class="lm-field">
+          <span class="lm-label">Launch fee per trade</span>
+
+          <div class="launch-fee-header">
+            <span class="launch-fee-label">Total fee</span>
+            <span class="launch-fee-value" id="quick-fee-display">
+              2% total · 1% creator · 1% prize pool
+            </span>
           </div>
-          <div class="lm-fee">
-            <span class="lm-label">Treasury fee</span>
+
+          <div class="launch-fee-range">
             <input
-              id="lm-fee-treasury"
-              class="lm-input"
-              type="number"
+              id="quick-fee-range"
+              type="range"
               min="0"
-              max="100"
-              value="50"
+              max="10"
+              step="0.5"
+              value="2"
             />
-            <span>%</span>
           </div>
+
+          <p class="launch-fee-note">
+            You can choose up to <strong>10% total fee</strong>.
+            Whatever you pick is split automatically:
+            <strong>50% to you as creator</strong> and
+            <strong>50% to the Winky prize pool</strong>.
+          </p>
         </div>
 
         <div id="lm-wallet-status" class="lm-wallet-status">
@@ -1786,16 +1789,20 @@
     }
   }
 
+ <script>
   function handleLaunchModalSubmit(event) {
     event.preventDefault();
 
-    const name = document.getElementById('lm-name').value.trim() || 'Unnamed token';
+    const name   = document.getElementById('lm-name').value.trim() || 'Unnamed token';
     const ticker = (document.getElementById('lm-ticker').value || '').trim().toUpperCase();
     const supply = document.getElementById('lm-supply').value.trim() || 'not set';
-    const emoji = document.getElementById('lm-emoji').value.trim();
-    const desc  = document.getElementById('lm-desc').value.trim();
-    const feeCreator  = document.getElementById('lm-fee-creator').value || '0';
-    const feeTreasury = document.getElementById('lm-fee-treasury').value || '0';
+    const emoji  = document.getElementById('lm-emoji').value.trim();
+    const desc   = document.getElementById('lm-desc').value.trim();
+
+    // Neuer Slider im Modal
+    const quickFeeRange = document.getElementById('quick-fee-range');
+    const totalFee = quickFeeRange ? parseFloat(quickFeeRange.value || '0') : 0;
+    const halfFee  = totalFee / 2;
 
     const walletBtn = document.getElementById('wallet-connect-btn');
     const creatorAddress = walletBtn && walletBtn.dataset.address
@@ -1812,24 +1819,24 @@
       network: 'solana',
       mintType: 'meme-token',
       feeModel: {
-        launchFeeUsd: 2,
+        tradeFeePercentTotal: totalFee,
         split: {
-          creator: Number(feeCreator),
-          treasury: Number(feeTreasury)
+          creator: halfFee,
+          prizePool: halfFee
         }
       },
       createdAt: new Date().toISOString()
     };
 
-    // Erstmal nur Vorschau – später kann das zu Backend / Smart Contract gehen.
     alert(
-      'Launch preview (UI only):\\n\\n' +
+      'Launch preview (UI only):\n\n' +
       JSON.stringify(data, null, 2)
     );
 
     closeLaunchModal();
   }
 </script>
+
   <script>
     // Simple fee slider: 0–10%, always 50/50 split
     function updateFeeDisplay() {
@@ -1854,6 +1861,30 @@
       updateFeeDisplay();
     });
   </script>
+<script>
+  // Gleiche Logik für den Quick-Launch-Slider im Modal
+  function updateQuickFeeDisplay() {
+    const range = document.getElementById('quick-fee-range');
+    const label = document.getElementById('quick-fee-display');
+    if (!range || !label) return;
+
+    const total = parseFloat(range.value || '0');
+    const half = (total / 2).toFixed(1).replace('.0','');
+    const totalPretty = total.toFixed(1).replace('.0','');
+
+    label.textContent =
+      totalPretty + '% total · ' +
+      half + '% creator · ' +
+      half + '% prize pool';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const range = document.getElementById('quick-fee-range');
+    if (!range) return;
+    range.addEventListener('input', updateQuickFeeDisplay);
+    updateQuickFeeDisplay();
+  });
+</script>
 
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
