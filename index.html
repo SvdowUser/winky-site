@@ -1040,9 +1040,10 @@
   <a href="#community">Community</a>
   <a href="#faq">FAQ</a>
 </nav>
-    <button id="wallet-connect-btn" class="btn btn-secondary nav-wallet" onclick="connectWinkyWallet()">
-  Connect Wallet
+<button id="wallet-button" class="btn btn-secondary nav-wallet">
+  Connect wallet
 </button>
+
 
   </header>
 
@@ -1700,45 +1701,7 @@
     }
   </script>
   
-<script>
-    function getSolanaProvider() {
-      if (window.phantom && window.phantom.solana) {
-        return window.phantom.solana; // Phantom Extension
-      }
-      if (window.solflare) {
-        return window.solflare; // Solflare
-      }
-      if (window.backpack) {
-        return window.backpack; // Backpack
-      }
-      if (window.solana && window.solana.isPhantom) {
-        return window.solana;
-      }
-      return null;
-    }
 
-    async function connectWinkyWallet() {
-      const btn = document.getElementById('wallet-connect-btn');
-      const provider = getSolanaProvider();
-
-      if (!provider) {
-        alert('No Solana wallet detected. Please install Phantom or another Solana wallet extension.');
-        return;
-      }
-
-      try {
-        const resp = await provider.connect();
-        const pubkey = (resp.publicKey || provider.publicKey).toString();
-
-        const short = pubkey.slice(0, 4) + '...' + pubkey.slice(-4);
-
-        btn.textContent = 'Connected: ' + short;
-        btn.dataset.address = pubkey;
-      } catch (err) {
-        console.log('Wallet connect cancelled or failed:', err);
-      }
-    }
-  </script>
     <script>
     function previewLaunchConfig() {
       const name = document.getElementById('launch-name').value || 'Unnamed token';
@@ -1767,12 +1730,63 @@
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
 </script>
+
+<script>
+  const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
+
+  function shortAddress(addr) {
+    if (!addr || addr.length < 8) return addr || "";
+    return addr.slice(0, 4) + "…" + addr.slice(-4);
+  }
+
+  async function connectWinkyWallet() {
+    const btn = document.getElementById("wallet-button");
+
+    if (!window.solana || !window.solana.isPhantom) {
+      alert("Please install the Phantom wallet extension (Phantom).");
+      window.open("https://phantom.app/", "_blank");
+      return;
+    }
+
+    try {
+      btn.disabled = true;
+      btn.textContent = "Connecting…";
+
+      const resp = await window.solana.connect();
+      const pubkey = resp.publicKey.toString();
+
+      // Wichtig: gleicher Key wie auf der Portfolio-Seite
+      localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+
+      btn.textContent = shortAddress(pubkey);
+    } catch (err) {
+      console.error("Wallet connect error:", err);
+      const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function initWinkyWalletButton() {
+    const btn = document.getElementById("wallet-button");
+    if (!btn) return;
+
+    btn.addEventListener("click", connectWinkyWallet);
+
+    const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+    btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
+  }
+
+  document.addEventListener("DOMContentLoaded", initWinkyWalletButton);
+</script>
+
+        
         <script>
   // === Launch-Modal öffnen / schließen =======================
   function openLaunchModal() {
     const modal        = document.getElementById('launch-modal');
-    const walletStatus = document.getElementById('lm-wallet-status');
-    const walletBtn    = document.getElementById('wallet-connect-btn');
+   const walletStatus = document.getElementById('lm-wallet-status');
 
     if (modal) {
       modal.style.display = 'flex';
@@ -1780,7 +1794,7 @@
 
     if (walletStatus && walletBtn) {
       const span = walletStatus.querySelector('span');
-      const addr = walletBtn.dataset.address;
+     const addr = localStorage.getItem("winkyWalletAddress");
 
       if (addr && span) {
         const short = addr.slice(0, 4) + '...' + addr.slice(-4);
@@ -1815,10 +1829,8 @@
     const totalFee = quickFeeRange ? parseFloat(quickFeeRange.value || '0') : 0;
     const halfFee  = totalFee / 2;
 
-    const walletBtn = document.getElementById('wallet-connect-btn');
-    const creatorAddress = walletBtn && walletBtn.dataset.address
-      ? walletBtn.dataset.address
-      : null;
+  const creatorAddress = localStorage.getItem("winkyWalletAddress") || null;
+
 
     const data = {
       name,
@@ -1894,60 +1906,7 @@
     }
   });
 </script>
-<script>
-  // kurze Helper-Funktion
-  function shortenAddress(addr) {
-    if (!addr) return "";
-    return addr.slice(0, 4) + "..." + addr.slice(-4);
-  }
 
-  async function connectWallet() {
-    const btn   = document.getElementById("connect-wallet-btn");
-    const label = document.getElementById("wallet-address-label");
-
-    if (!window.solana || !window.solana.isPhantom) {
-      alert("Phantom Wallet nicht gefunden. Bitte Phantom installieren.");
-      window.open("https://phantom.app/", "_blank");
-      return;
-    }
-
-    try {
-      btn.disabled = true;
-      btn.textContent = "Connecting…";
-
-      const resp = await window.solana.connect();
-      const pubkey = resp.publicKey.toString();
-
-      // im LocalStorage merken, damit andere Seiten (z.B. Portfolio) sie lesen können
-      localStorage.setItem("winky_wallet", pubkey);
-
-      btn.textContent = "Connected";
-      label.textContent = shortenAddress(pubkey);
-    } catch (err) {
-      console.error("Wallet connect error:", err);
-      btn.textContent = "Connect wallet";
-    } finally {
-      btn.disabled = false;
-    }
-  }
-
-  function initWalletUi() {
-    const btn   = document.getElementById("connect-wallet-btn");
-    const label = document.getElementById("wallet-address-label");
-    if (!btn) return;
-
-    btn.addEventListener("click", connectWallet);
-
-    // falls schon verbunden (Adresse im LocalStorage)
-    const saved = localStorage.getItem("winky_wallet");
-    if (saved) {
-      btn.textContent = "Connected";
-      label.textContent = shortenAddress(saved);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", initWalletUi);
-</script>
 
 
 </body>
