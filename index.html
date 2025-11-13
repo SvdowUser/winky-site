@@ -632,6 +632,29 @@
         display: none;
       }
     }
+    /* Wallet Button in der Navbar */
+.nav-wallet {
+  margin-left: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.nav-wallet:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-1px);
+}
+    @media (max-width: 720px) {
+  .nav-wallet {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
   </style>
 </head>
 
@@ -655,6 +678,10 @@
   <a href="#community">Community</a>
   <a href="#faq">FAQ</a>
 </nav>
+    <button id="wallet-connect-btn" class="btn btn-secondary nav-wallet" onclick="connectWinkyWallet()">
+  Connect Wallet
+</button>
+
   </header>
 
   <!-- HERO -->
@@ -1116,7 +1143,47 @@
       }
     }
   </script>
+  
+<script>
+    function getSolanaProvider() {
+      if (window.phantom && window.phantom.solana) {
+        return window.phantom.solana; // Phantom Extension
+      }
+      if (window.solflare) {
+        return window.solflare; // Solflare
+      }
+      if (window.backpack) {
+        return window.backpack; // Backpack
+      }
+      if (window.solana && window.solana.isPhantom) {
+        return window.solana;
+      }
+      return null;
+    }
 
+    async function connectWinkyWallet() {
+      const btn = document.getElementById('wallet-connect-btn');
+      const provider = getSolanaProvider();
+
+      if (!provider) {
+        alert('No Solana wallet detected. Please install Phantom or another Solana wallet extension.');
+        return;
+      }
+
+      try {
+        const resp = await provider.connect();
+        const pubkey = (resp.publicKey || provider.publicKey).toString();
+
+        const short = pubkey.slice(0, 4) + '...' + pubkey.slice(-4);
+
+        btn.textContent = 'Connected: ' + short;
+        btn.dataset.address = pubkey;
+      } catch (err) {
+        console.log('Wallet connect cancelled or failed:', err);
+      }
+    }
+  </script>
+  
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
 </script>
