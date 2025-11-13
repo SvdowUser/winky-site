@@ -155,14 +155,16 @@
     .checkbox-pill input { accent-color: var(--accent); }
 
     /* TABLE */
-    .table-wrapper {
-      margin-top: 8px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.10);
-      overflow: hidden;
-      background: radial-gradient(circle at top left,
-        rgba(0,255,247,0.08), var(--card));
-    }
+.table-wrapper {
+  margin-top: 8px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.10);
+  overflow: hidden;
+  background: radial-gradient(circle at top left,
+    rgba(0,255,247,0.08), var(--card));
+  padding-right: 8px;   /* NEU: Platz rechts im Wrapper */
+}
+
 
     table {
       width: 100%;
@@ -181,7 +183,7 @@
     /* etwas extra Platz für die Buttons in der letzten Spalte */
     th:last-child,
     td:last-child {
-      padding-right: 24px;
+      padding-right: 32px;
     }
 
     th {
