@@ -411,17 +411,25 @@
       return "$" + n.toFixed(6);
     }
 
-    function computeRiskScore(marketCap, volume24h, liquidityUsd) {
-      marketCap   = marketCap   || 0;
-      volume24h   = volume24h   || 0;
-      liquidityUsd= liquidityUsd|| 0;
+function computeRiskScore(marketCap, volume24h, liquidityUsd) {
+  marketCap    = marketCap    || 0;
+  volume24h    = volume24h    || 0;
+  liquidityUsd = liquidityUsd || 0;
 
-      if (liquidityUsd >= 200_000 && marketCap >= 10_000_000 && volume24h >= 500_000)
-        return 1; // safe
-      if (liquidityUsd >= 50_000 && marketCap >= 1_000_000 && volume24h >= 100_000)
-        return 2; // medium
-      return 3;   // high
-    }
+  // Sehr etablierte Tokens (JUP, RAY, WETH, WBTC, etc.)
+  if (liquidityUsd >= 5_000_000 && marketCap >= 100_000_000 && volume24h >= 5_000_000) {
+    return 1; // safe
+  }
+
+  // Solide Midcaps / bessere Memes
+  if (liquidityUsd >= 500_000 && marketCap >= 10_000_000 && volume24h >= 500_000) {
+    return 2; // medium
+  }
+
+  // Rest: eher high risk
+  return 3;
+}
+
 
     function riskLabel(score) {
       if (score === 1) return "safe";
@@ -526,10 +534,13 @@ const volume24h =
   0;
 
 
-          const liquidityUsd =
-            item.liquidityUsd ||
-            (item.liquidity && (item.liquidity.usd || item.liquidity.USD)) ||
-            0;
+         // Liquidity aus Birdeye – bei Trending ist das einfach eine Zahl (USD)
+const liquidityUsd =
+  (typeof item.liquidity === "number" ? item.liquidity : 0) ||
+  item.liquidityUsd ||
+  (item.liquidity && (item.liquidity.usd || item.liquidity.USD)) ||
+  0;
+
 
           const priceUsd =
             item.priceUsd ||
