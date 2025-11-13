@@ -376,6 +376,12 @@
           </tbody>
         </table>
       </div>
+      <!-- LOAD MORE -->
+      <div style="margin-top: 12px; text-align: center;">
+        <button id="load-more-btn" class="btn-xs">
+          Load more tokens
+        </button>
+      </div>
 
       <p class="table-footer-note">
         Risk tags are rough UX hints based on liquidity &amp; volume – not a real audit.
@@ -392,10 +398,18 @@
   // Deine Worker-URL (ohne / am Ende!)
   const WORKER_URL = "https://misty-king-27f4.christopher-milosch.workers.dev";
 
-  // Birdeye erlaubt max. 20 pro Request → 1 Page
-  const LIMIT = 20;
+  // Birdeye: max. 20 pro Request
+  const PAGE_SIZE = 20;
 
+  // Wie viele Seiten max. holen? (z.B. 5 Seiten = 100 Tokens)
+  const MAX_PAGES = 5;
+
+  let currentPage = 0;              // 0 = erste Seite
+  let isLoading = false;
+
+  // Token-Speicher
   let cachedTokens = [];
+  const tokenMap = new Map();       // key = address, value = token-Objekt
 
   // ==============================
   // Helper: formatting & risk
@@ -412,15 +426,15 @@
     return "$" + n.toFixed(6);
   }
 
-  // Risk-Heuristik: große Caps & viel Liquidity = safe; Midcaps = medium; Rest = high
+  // Risk-Heuristik (grobe, aber etwas smartere Version)
   function computeRiskScore(marketCap, volume24h, liquidityUsd) {
     marketCap    = marketCap    || 0;
     volume24h    = volume24h    || 0;
     liquidityUsd = liquidityUsd || 0;
 
-    // Große, etablierte Tokens → safe
+    // Eher etablierte Coins → safe
     if (
-      (marketCap >= 1_000_000_000 && liquidityUsd >= 1_000_000) ||   // >1B Mcap mit ordentlicher Liquidity
+      (marketCap >= 1_000_000_000 && liquidityUsd >= 1_000_000) ||
       (marketCap >= 300_000_000 && liquidityUsd >= 5_000_000 && volume24h >= 5_000_000) ||
       (liquidityUsd >= 25_000_000 && volume24h >= 25_000_000)
     ) {
@@ -435,7 +449,7 @@
       return 2; // medium
     }
 
-    // Alles darunter → high
+    // Rest → high
     return 3;
   }
 
@@ -455,15 +469,23 @@
   // Fetch von Worker (Birdeye Proxy)
   // ==============================
 
-  async function loadTokens() {
+  async function loadPage(pageIndex) {
+    if (isLoading) return;
+    if (pageIndex >= MAX_PAGES) return;
+
     const tbody = document.getElementById("token-rows");
-    tbody.innerHTML =
-      '<tr class="table-message-row"><td colspan="8">Loading live data from Birdeye…</td></tr>';
+    const loadMoreBtn = document.getElementById("load-more-btn");
+
+    isLoading = true;
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent = "Loading…";
+
+    // offset = pageIndex * PAGE_SIZE
+    const offset = pageIndex * PAGE_SIZE;
+    const url = `${WORKER_URL}?limit=${PAGE_SIZE}&offset=${offset}`;
+    console.log("Fetching page", pageIndex, "url:", url);
 
     try {
-      const url = `${WORKER_URL}?limit=${LIMIT}&offset=0`;
-      console.log("Fetching from Worker:", url);
-
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error("Worker HTTP " + res.status);
@@ -476,8 +498,6 @@
         throw new Error(json.message || "Worker returned success=false");
       }
 
-      // Struktur laut deinem letzten Screenshot:
-      // { success:true, status:200, data:{ data:{ tokens:[...], total:1000 }, success:true } }
       const tokensArr =
         json.data &&
         json.data.data &&
@@ -485,16 +505,31 @@
           ? json.data.data.tokens
           : [];
 
-      if (!tokensArr.length) {
-        throw new Error("No tokens in response");
+      if (!tokensArr.length && pageIndex === 0) {
+        tbody.innerHTML =
+          '<tr class="table-message-row"><td colspan="8">No tokens returned from Birdeye.</td></tr>';
+        loadMoreBtn.style.display = "none";
+        return;
       }
 
-      const tokens = tokensArr.map((item) => {
+      if (!tokensArr.length) {
+        // Keine weiteren Daten → Button verstecken
+        loadMoreBtn.style.display = "none";
+        return;
+      }
+
+      // neue Tokens einbauen & deduplizieren
+      tokensArr.forEach((item) => {
         const name   = item.name   || "Unknown";
         const symbol = item.symbol || (name ? name.slice(0, 4).toUpperCase() : "?");
-        const chain  = "solana"; // Worker setzt x-chain=solana
+        const chain  = "solana";
 
-        const address   = item.address || "";
+        const address = item.address || "";
+        const key = address || `${symbol}:${name}`;
+
+        // wenn wir den Token schon haben → überspringen
+        if (tokenMap.has(key)) return;
+
         const imageUrl  = item.logoURI || null;
         const marketCap = (item.marketcap != null ? item.marketcap : (item.fdv || 0));
         const volume24h = item.volume24hUSD || 0;
@@ -507,7 +542,7 @@
           ? `https://birdeye.so/token/${address}?chain=${chain}`
           : "https://birdeye.so";
 
-        return {
+        const tokenObj = {
           name,
           symbol,
           chain,
@@ -521,17 +556,38 @@
           fromWinky: false,
           imageUrl,
           originalRank: typeof item.rank === "number" ? item.rank : 999999,
+          address,
+          key,
         };
+
+        tokenMap.set(key, tokenObj);
       });
 
-      cachedTokens = tokens;
+      // aus Map → Array
+      cachedTokens = Array.from(tokenMap.values());
       applyFiltersAndRender();
+
+      currentPage = pageIndex; // merken, wo wir sind
+
+      // Wenn wir am Limit der Seiten sind → Button verstecken
+      if (currentPage >= MAX_PAGES - 1) {
+        loadMoreBtn.style.display = "none";
+      } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = "Load more tokens";
+      }
     } catch (err) {
       console.error("Birdeye load failed:", err);
-      tbody.innerHTML =
-        '<tr class="table-message-row"><td colspan="8">Failed to load data from Birdeye. ' +
-        (err && err.message ? err.message : "") +
-        "</td></tr>";
+      if (cachedTokens.length === 0) {
+        tbody.innerHTML =
+          '<tr class="table-message-row"><td colspan="8">Failed to load data from Birdeye. ' +
+          (err && err.message ? err.message : "") +
+          "</td></tr>";
+      }
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.textContent = "Load more tokens";
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -573,7 +629,7 @@
       return true;
     });
 
-    // Sortierung: safe → medium → high, dann rank (1 = top)
+    // Sort: safe → medium → high, dann trending-Rank
     list.sort((a, b) => {
       if (a.riskScore !== b.riskScore) return a.riskScore - b.riskScore;
       return a.originalRank - b.originalRank;
@@ -636,10 +692,21 @@
     document.getElementById("filter-risk").addEventListener("change", applyFiltersAndRender);
     document.getElementById("filter-mcap").addEventListener("change", applyFiltersAndRender);
 
-    // nur 1x beim Laden, KEIN setInterval → weniger 429
-    loadTokens();
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    loadMoreBtn.addEventListener("click", () => {
+      const nextPage = currentPage + 1;
+      if (nextPage < MAX_PAGES) {
+        loadPage(nextPage);
+      } else {
+        loadMoreBtn.style.display = "none";
+      }
+    });
+
+    // Beim ersten Laden direkt Page 0 holen
+    loadPage(0);
   });
 </script>
+
 
 
 
