@@ -362,12 +362,14 @@
           placeholder="Search by name or ticker…"
         />
 
-        <select id="filter-risk" class="select-pill">
-          <option value="safe" selected>Risk: safe first</option>
-          <option value="all">Risk: all</option>
-          <option value="medium">Only medium</option>
-          <option value="high">Only high</option>
-        </select>
+       <select id="filter-risk" class="select-pill">
+  <!-- Zeigt ALLE, sortiert aber trotzdem safe → medium → high -->
+  <option value="all" selected>Risk: safe first</option>
+  <option value="safe">Only safe</option>
+  <option value="medium">Only medium</option>
+  <option value="high">Only high</option>
+</select>
+
 
         <select id="filter-mcap" class="select-pill">
           <option value="all" selected>Market cap: all</option>
