@@ -155,7 +155,14 @@
     .checkbox-pill input { accent-color: var(--accent); }
 
     /* TABLE */
- .table-wrappe
+    .table-wrapper {
+      margin-top: 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      overflow: hidden;
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.08), var(--card));
+    }
 
     table {
       width: 100%;
@@ -170,12 +177,12 @@
       text-align: left;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-/* etwas extra Platz für die Buttons in der letzten Spalte,
-   damit der runde Rand nicht vom Wrapper abgeschnitten wird */
-th:last-child,
-td:last-child {
-  padding-right: 24px;
-}
+
+    /* etwas extra Platz für die Buttons in der letzten Spalte */
+    th:last-child,
+    td:last-child {
+      padding-right: 24px;
+    }
 
     th {
       font-size: 11px;
@@ -239,6 +246,7 @@ td:last-child {
       justify-content: center;
       min-width: 60px;
     }
+
     .change-badge {
       padding: 3px 8px;
       border-radius: 999px;
@@ -280,20 +288,20 @@ td:last-child {
       background: rgba(0,255,247,0.06);
     }
 
-.btn-xs {
-  font-size: 11px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(0,0,0,0.6);
-  color: var(--text-main);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  margin-right: 2px; /* kleiner Abstand zur Kante */
-}
+    .btn-xs {
+      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.6);
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
 
     .btn-xs:hover { background: rgba(255,255,255,0.06); }
 
@@ -382,28 +390,28 @@ td:last-child {
       <!-- TABLE -->
       <div class="table-wrapper">
         <table>
-       <thead>
-<thead>
-  <tr>
-    <th>Token</th>
-    <th>Chain</th>
-    <th>Price</th>
-    <th>24h change</th>   <!-- NEU -->
-    <th>Market cap</th>
-    <th>24h volume</th>
-    <th>Risk</th>
-    <th>From Winky</th>
-    <th></th>
-  </tr>
-</thead>
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Chain</th>
+              <th>Price</th>
+              <th>24h change</th>
+              <th>Market cap</th>
+              <th>24h volume</th>
+              <th>Risk</th>
+              <th>From Winky</th>
+              <th></th>
+            </tr>
+          </thead>
 
           <tbody id="token-rows">
             <tr class="table-message-row">
-              <td colspan="8">Loading live data from Birdeye…</td>
+              <td colspan="9">Loading live data from Birdeye…</td>
             </tr>
           </tbody>
         </table>
       </div>
+
       <!-- LOAD MORE -->
       <div style="margin-top: 12px; text-align: center;">
         <button id="load-more-btn" class="btn-xs">
@@ -422,27 +430,19 @@ td:last-child {
   // ==============================
   // CONFIG
   // ==============================
-
-  // Deine Worker-URL (ohne / am Ende!)
   const WORKER_URL = "https://misty-king-27f4.christopher-milosch.workers.dev";
+  const PAGE_SIZE  = 20;   // Birdeye limit
+  const MAX_PAGES  = 5;    // bis zu 100 Tokens
 
-  // Birdeye: max. 20 pro Request
-  const PAGE_SIZE = 20;
+  let currentPage  = 0;
+  let isLoading    = false;
 
-  // Wie viele Seiten max. holen? (z.B. 5 Seiten = 100 Tokens)
-  const MAX_PAGES = 5;
-
-  let currentPage = 0;              // 0 = erste Seite
-  let isLoading = false;
-
-  // Token-Speicher
   let cachedTokens = [];
-  const tokenMap = new Map();       // key = address, value = token-Objekt
+  const tokenMap   = new Map();  // key = address (oder fallback), value = token
 
   // ==============================
-  // Helper: formatting & risk
+  // Helper
   // ==============================
-
   function formatUsd(num) {
     if (num == null || isNaN(num)) return "—";
     const n = Number(num);
@@ -453,45 +453,45 @@ td:last-child {
     if (abs >= 1)             return "$" + n.toFixed(3);
     return "$" + n.toFixed(6);
   }
-    function formatChange(pct) {
-      if (pct == null || isNaN(pct)) return '—';
-      const v = Number(pct);
-      const sign = v > 0 ? '+' : (v < 0 ? '' : '');
-      return sign + v.toFixed(1) + '%';
-    }
 
-    function changeClass(pct) {
-      if (pct == null || isNaN(pct)) return 'change-flat';
-      const v = Number(pct);
-      if (v > 0.1) return 'change-pos';
-      if (v < -0.1) return 'change-neg';
-      return 'change-flat';
-    }
+  function formatChange(pct) {
+    if (pct == null || isNaN(pct)) return "—";
+    const v = Number(pct);
+    const sign = v > 0 ? "+" : (v < 0 ? "" : "");
+    return sign + v.toFixed(1) + "%";
+  }
 
-  // Risk-Heuristik (grobe, aber etwas smartere Version)
+  function changeClass(pct) {
+    if (pct == null || isNaN(pct)) return "change-flat";
+    const v = Number(pct);
+    if (v > 0.1)  return "change-pos";
+    if (v < -0.1) return "change-neg";
+    return "change-flat";
+  }
+
   function computeRiskScore(marketCap, volume24h, liquidityUsd) {
     marketCap    = marketCap    || 0;
     volume24h    = volume24h    || 0;
     liquidityUsd = liquidityUsd || 0;
 
-    // Eher etablierte Coins → safe
+    // eher etablierte Coins → safe
     if (
       (marketCap >= 1_000_000_000 && liquidityUsd >= 1_000_000) ||
       (marketCap >= 300_000_000 && liquidityUsd >= 5_000_000 && volume24h >= 5_000_000) ||
       (liquidityUsd >= 25_000_000 && volume24h >= 25_000_000)
     ) {
-      return 1; // safe
+      return 1;
     }
 
-    // Midcaps → medium
+    // midcaps → medium
     if (
       (marketCap >= 20_000_000 && liquidityUsd >= 1_000_000 && volume24h >= 1_000_000) ||
       (marketCap >= 5_000_000 && liquidityUsd >= 300_000 && volume24h >= 300_000)
     ) {
-      return 2; // medium
+      return 2;
     }
 
-    // Rest → high
+    // rest → high
     return 3;
   }
 
@@ -508,37 +508,30 @@ td:last-child {
   }
 
   // ==============================
-  // Fetch von Worker (Birdeye Proxy)
+  // Fetch von Worker
   // ==============================
-
   async function loadPage(pageIndex) {
     if (isLoading) return;
     if (pageIndex >= MAX_PAGES) return;
 
-    const tbody = document.getElementById("token-rows");
+    const tbody       = document.getElementById("token-rows");
     const loadMoreBtn = document.getElementById("load-more-btn");
 
     isLoading = true;
     loadMoreBtn.disabled = true;
     loadMoreBtn.textContent = "Loading…";
 
-    // offset = pageIndex * PAGE_SIZE
     const offset = pageIndex * PAGE_SIZE;
-    const url = `${WORKER_URL}?limit=${PAGE_SIZE}&offset=${offset}`;
+    const url    = `${WORKER_URL}?limit=${PAGE_SIZE}&offset=${offset}`;
     console.log("Fetching page", pageIndex, "url:", url);
 
     try {
       const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error("Worker HTTP " + res.status);
-      }
-
+      if (!res.ok) throw new Error("Worker HTTP " + res.status);
       const json = await res.json();
       console.log("Worker response:", json);
 
-      if (!json.success) {
-        throw new Error(json.message || "Worker returned success=false");
-      }
+      if (!json.success) throw new Error(json.message || "Worker success=false");
 
       const tokensArr =
         json.data &&
@@ -549,18 +542,16 @@ td:last-child {
 
       if (!tokensArr.length && pageIndex === 0) {
         tbody.innerHTML =
-          '<tr class="table-message-row"><td colspan="8">No tokens returned from Birdeye.</td></tr>';
+          '<tr class="table-message-row"><td colspan="9">No tokens returned from Birdeye.</td></tr>';
         loadMoreBtn.style.display = "none";
         return;
       }
 
       if (!tokensArr.length) {
-        // Keine weiteren Daten → Button verstecken
         loadMoreBtn.style.display = "none";
         return;
       }
 
-      // neue Tokens einbauen & deduplizieren
       tokensArr.forEach((item) => {
         const name   = item.name   || "Unknown";
         const symbol = item.symbol || (name ? name.slice(0, 4).toUpperCase() : "?");
@@ -568,22 +559,19 @@ td:last-child {
 
         const address = item.address || "";
         const key = address || `${symbol}:${name}`;
+        if (tokenMap.has(key)) return; // dedupe
 
-        // wenn wir den Token schon haben → überspringen
-        if (tokenMap.has(key)) return;
-
-        const imageUrl  = item.logoURI || null;
-        const marketCap = (item.marketcap != null ? item.marketcap : (item.fdv || 0));
-        const volume24h = item.volume24hUSD || 0;
+        const imageUrl     = item.logoURI || null;
+        const marketCap    = (item.marketcap != null ? item.marketcap : (item.fdv || 0));
+        const volume24h    = item.volume24hUSD || 0;
         const liquidityUsd = item.liquidity || 0;
-        const priceUsd = item.price || 0;
+        const priceUsd     = item.price || 0;
 
-                  const change24h =
-            item.price24hChangePercent ||
-            item.priceChange24hPercent ||
-            item.priceChange24h ||
-            0;
-
+        const change24h =
+          item.price24hChangePercent ||
+          item.priceChange24hPercent ||
+          item.priceChange24h ||
+          0;
 
         const riskScore = computeRiskScore(marketCap, volume24h, liquidityUsd);
 
@@ -599,7 +587,7 @@ td:last-child {
           volume24h,
           priceUsd,
           liquidityUsd,
-          change24h, 
+          change24h,
           riskScore,
           riskLabel: riskLabel(riskScore),
           dexUrl,
@@ -613,13 +601,11 @@ td:last-child {
         tokenMap.set(key, tokenObj);
       });
 
-      // aus Map → Array
       cachedTokens = Array.from(tokenMap.values());
       applyFiltersAndRender();
 
-      currentPage = pageIndex; // merken, wo wir sind
+      currentPage = pageIndex;
 
-      // Wenn wir am Limit der Seiten sind → Button verstecken
       if (currentPage >= MAX_PAGES - 1) {
         loadMoreBtn.style.display = "none";
       } else {
@@ -630,7 +616,7 @@ td:last-child {
       console.error("Birdeye load failed:", err);
       if (cachedTokens.length === 0) {
         tbody.innerHTML =
-          '<tr class="table-message-row"><td colspan="8">Failed to load data from Birdeye. ' +
+          '<tr class="table-message-row"><td colspan="9">Failed to load data from Birdeye. ' +
           (err && err.message ? err.message : "") +
           "</td></tr>";
       }
@@ -644,7 +630,6 @@ td:last-child {
   // ==============================
   // Render + Filter
   // ==============================
-
   function applyFiltersAndRender() {
     const tbody      = document.getElementById("token-rows");
     const search     = (document.getElementById("search").value || "").trim().toLowerCase();
@@ -653,7 +638,6 @@ td:last-child {
 
     let list = cachedTokens.slice();
 
-    // Suche
     if (search) {
       list = list.filter((t) =>
         t.name.toLowerCase().includes(search) ||
@@ -661,7 +645,6 @@ td:last-child {
       );
     }
 
-    // Risk-Filter
     if (riskFilter === "safe") {
       list = list.filter((t) => t.riskScore === 1);
     } else if (riskFilter === "medium") {
@@ -670,7 +653,6 @@ td:last-child {
       list = list.filter((t) => t.riskScore === 3);
     }
 
-    // Marketcap-Filter
     list = list.filter((t) => {
       const mc = t.marketCap || 0;
       if (mcapFilter === "small") return mc > 0 && mc < 1_000_000;
@@ -679,7 +661,6 @@ td:last-child {
       return true;
     });
 
-    // Sort: safe → medium → high, dann trending-Rank
     list.sort((a, b) => {
       if (a.riskScore !== b.riskScore) return a.riskScore - b.riskScore;
       return a.originalRank - b.originalRank;
@@ -687,7 +668,7 @@ td:last-child {
 
     if (!list.length) {
       tbody.innerHTML =
-        '<tr class="table-message-row"><td colspan="8">No tokens match your filters right now.</td></tr>';
+        '<tr class="table-message-row"><td colspan="9">No tokens match your filters right now.</td></tr>';
       return;
     }
 
@@ -700,40 +681,40 @@ td:last-child {
         ? '<span class="from-winky-pill">WINKY LAUNCH</span>'
         : '<span class="token-symbol">—</span>';
 
-        return `
-          <tr>
-            <td>
-              <div class="token-cell">
-                ${logo}
-                <div>
-                  <div class="token-name">${t.name}</div>
-                  <div class="token-symbol">$${t.symbol}</div>
-                </div>
+      return `
+        <tr>
+          <td>
+            <div class="token-cell">
+              ${logo}
+              <div>
+                <div class="token-name">${t.name}</div>
+                <div class="token-symbol">$${t.symbol}</div>
               </div>
-            </td>
-            <td>${t.chain || "solana"}</td>
-            <td class="number-cell">${formatUsd(t.priceUsd)}</td>
-            <td class="number-cell">
-              <span class="change-badge ${changeClass(t.change24h)}">
-                ${formatChange(t.change24h)}
-              </span>
-            </td>
-            <td class="number-cell">${formatUsd(t.marketCap)}</td>
-            <td class="number-cell">${formatUsd(t.volume24h)}</td>
-            <td>
-              <span class="risk-badge ${riskClass(t.riskScore)}">
-                ${t.riskLabel}
-              </span>
-            </td>
-            <td>${fromWinky}</td>
-            <td>
-              <a class="btn-xs" href="${t.dexUrl}" target="_blank" rel="noreferrer">
-                View on Birdeye
-              </a>
-            </td>
-          </tr>
-        `;
-
+            </div>
+          </td>
+          <td>${t.chain || "solana"}</td>
+          <td class="number-cell">${formatUsd(t.priceUsd)}</td>
+          <td class="number-cell">
+            <span class="change-badge ${changeClass(t.change24h)}">
+              ${formatChange(t.change24h)}
+            </span>
+          </td>
+          <td class="number-cell">${formatUsd(t.marketCap)}</td>
+          <td class="number-cell">${formatUsd(t.volume24h)}</td>
+          <td>
+            <span class="risk-badge ${riskClass(t.riskScore)}">
+              ${t.riskLabel}
+            </span>
+          </td>
+          <td>${fromWinky}</td>
+          <td>
+            <a class="btn-xs" href="${t.dexUrl}" target="_blank" rel="noreferrer">
+              View on Birdeye
+            </a>
+          </td>
+        </tr>
+      `;
+    });
 
     tbody.innerHTML = rows.join("");
   }
@@ -741,7 +722,6 @@ td:last-child {
   // ==============================
   // Init
   // ==============================
-
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("search").addEventListener("input", applyFiltersAndRender);
     document.getElementById("filter-risk").addEventListener("change", applyFiltersAndRender);
@@ -757,13 +737,10 @@ td:last-child {
       }
     });
 
-    // Beim ersten Laden direkt Page 0 holen
+    // direkt erste Page laden
     loadPage(0);
   });
 </script>
-
-
-
 
 </body>
 </html>
