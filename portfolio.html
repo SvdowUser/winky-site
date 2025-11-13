@@ -85,12 +85,17 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.18);
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-main);
       background: rgba(0,0,0,0.55);
-      max-width: 200px;
+      max-width: 220px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .wallet-pill.disconnected {
+      color: var(--text-muted);
     }
 
     /* PAGE WRAPPER */
@@ -98,7 +103,7 @@
       max-width: 980px;
       margin: 0 auto;
       padding: 0 20px 40px;
-      flex: 1 0 auto; /* damit der Bereich den Bildschirm ausfüllt → kein „harte Kante“ unten */
+      flex: 1 0 auto; /* fills the screen → no ugly cut at the bottom */
     }
 
     section { margin-top: 32px; }
@@ -155,7 +160,7 @@
       border: 1px solid rgba(255,255,255,0.10);
       background: radial-gradient(circle at top left,
         rgba(0,255,247,0.08), var(--card));
-      overflow: hidden;   /* hier kein Scrollbalken */
+      overflow: hidden;
     }
 
     table {
@@ -290,7 +295,10 @@
       <a href="portfolio.html" class="active">Portfolio</a>
       <a href="tracker.html">Token tracker</a>
     </nav>
-    <div id="wallet-pill" class="wallet-pill">Not connected</div>
+    <!-- shared wallet button -->
+    <button id="wallet-button" class="wallet-pill disconnected">
+      Connect wallet
+    </button>
   </header>
 
   <!-- PAGE CONTENT -->
@@ -305,10 +313,12 @@
 
       <div class="wallet-card" id="wallet-card">
         <div class="wallet-card-title">Connected wallet:</div>
-        <div class="wallet-card-address" id="wallet-address">No wallet connected</div>
+        <div class="wallet-card-address" id="wallet-address">
+          No wallet connected – connect on the top right first.
+        </div>
         <div style="margin-top:6px; font-size:12px; color:var(--text-muted);">
-          Portfolio-Ansicht ist <strong>read-only</strong>. Wir lesen nur öffentliche
-          On-chain Daten – keine Private Keys.
+          This portfolio view is <strong>read-only</strong>. We only read public
+          on-chain data – never your private keys.
         </div>
       </div>
 
@@ -333,32 +343,92 @@
       </div>
 
       <p class="table-footer-note">
-        24h-Change: Preisänderung des Tokens in Prozent. Werte und Preise sind grobe Indikationen –
-        immer selbst prüfen, bevor du handelst.
+        24h change shows the price move of the token in percent.
+        Values and prices are rough indicators – always double-check before you trade.
       </p>
     </section>
   </main>
 
   <script>
     // ==============================
-    // CONFIG
+    // SHARED WALLET LOGIC
+    // (use this on ALL pages)
     // ==============================
 
-    // HIER deine Portfolio-Worker-URL eintragen (ähnlich wie beim Token-Trending-Worker)
-    const PORTFOLIO_WORKER_URL = "https://DEIN-PORTFOLIO-WORKER.workers.dev";
-
-    // wir gehen davon aus, dass du die Public Key im LocalStorage speicherst
-    // z.B. unter "winkyWalletPublicKey" – das kannst du anpassen, wenn du einen anderen Key nutzt
-    const STORAGE_KEY = "winkyWalletPublicKey";
-
-    // ==============================
-    // Helper
-    // ==============================
+    const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
 
     function shortAddress(addr) {
       if (!addr || addr.length < 8) return addr || "";
       return addr.slice(0,4) + "…" + addr.slice(-4);
     }
+
+    function updateWalletUi(address) {
+      const btn = document.getElementById("wallet-button");
+      if (!btn) return;
+
+      if (address) {
+        btn.classList.remove("disconnected");
+        btn.textContent = shortAddress(address);
+      } else {
+        btn.classList.add("disconnected");
+        btn.textContent = "Connect wallet";
+      }
+    }
+
+    async function connectWallet() {
+      const provider = window.solana;
+      if (!provider || !provider.isPhantom) {
+        alert("Please install the Phantom wallet extension to connect.");
+        return;
+      }
+
+      try {
+        const resp = await provider.connect();
+        const pubkey = resp.publicKey.toString();
+        localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+        updateWalletUi(pubkey);
+        return pubkey;
+      } catch (e) {
+        console.error("Wallet connect failed:", e);
+        return null;
+      }
+    }
+
+    function initWalletButton() {
+      const btn = document.getElementById("wallet-button");
+      if (!btn) return;
+
+      btn.addEventListener("click", async () => {
+        const stored = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+        if (stored) {
+          // maybe later: show a small menu (disconnect, switch, …)
+          return;
+        }
+        const connected = await connectWallet();
+        if (connected) {
+          // if we connect here on portfolio, we also want to load the portfolio
+          loadPortfolioIfReady(connected);
+          const addrEl = document.getElementById("wallet-address");
+          if (addrEl) addrEl.textContent = connected;
+        }
+      });
+
+      // initial state: check localStorage and Phantom
+      let addr = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      if (!addr && window.solana && window.solana.isConnected && window.solana.publicKey) {
+        addr = window.solana.publicKey.toString();
+        localStorage.setItem(WINKY_WALLET_STORAGE_KEY, addr);
+      }
+      if (addr) updateWalletUi(addr); else updateWalletUi(null);
+      return addr;
+    }
+
+    // ==============================
+    // PORTFOLIO LOADING
+    // ==============================
+
+    // TODO: set this to your real Portfolio worker URL
+    const PORTFOLIO_WORKER_URL = "https://YOUR-PORTFOLIO-WORKER.workers.dev";
 
     function formatUsd(num) {
       if (num == null || isNaN(num)) return "—";
@@ -393,17 +463,13 @@
       return "change-flat";
     }
 
-    // ==============================
-    // Portfolio laden
-    // ==============================
-
-    async function loadPortfolio(wallet) {
+    async function loadPortfolio(walletAddress) {
       const tbody = document.getElementById("portfolio-rows");
       tbody.innerHTML =
         '<tr class="table-message-row"><td colspan="5">Loading portfolio from Birdeye…</td></tr>';
 
       try {
-        const url = `${PORTFOLIO_WORKER_URL}?wallet=${encodeURIComponent(wallet)}`;
+        const url = `${PORTFOLIO_WORKER_URL}?wallet=${encodeURIComponent(walletAddress)}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error("Worker HTTP " + res.status);
         const json = await res.json();
@@ -413,8 +479,7 @@
           throw new Error(json.message || "Worker returned success=false");
         }
 
-        // ⚠️ Annahme Response-formats:
-        // json.data.data.tokens = Array von Tokens
+        // Assumed format: json.data.data.tokens = array
         const tokensArr =
           json.data &&
           json.data.data &&
@@ -454,7 +519,6 @@
           };
         });
 
-        // sortiert nach Portfolio-Wert
         mapped.sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0));
 
         const rows = mapped.map((t) => {
@@ -495,26 +559,20 @@
       }
     }
 
+    function loadPortfolioIfReady(initialAddress) {
+      const addr = initialAddress || localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      if (!addr) return;
+      const addrEl = document.getElementById("wallet-address");
+      if (addrEl) addrEl.textContent = addr;
+      loadPortfolio(addr);
+    }
+
     // ==============================
-    // Init
+    // INIT
     // ==============================
     document.addEventListener("DOMContentLoaded", () => {
-      const walletAddr = localStorage.getItem(STORAGE_KEY);
-
-      const pill   = document.getElementById("wallet-pill");
-      const card   = document.getElementById("wallet-card");
-      const addrEl = document.getElementById("wallet-address");
-
-      if (!walletAddr) {
-        pill.textContent   = "Not connected";
-        addrEl.textContent = "No wallet connected – connect on the home page first.";
-        return;
-      }
-
-      pill.textContent   = shortAddress(walletAddr);
-      addrEl.textContent = walletAddr;
-
-      loadPortfolio(walletAddr);
+      const addr = initWalletButton();
+      loadPortfolioIfReady(addr);
     });
   </script>
 </body>
