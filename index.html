@@ -551,6 +551,72 @@
       font-size: 13px;
       color: var(--text-muted);
     }
+    /* COMMUNITY CTA */
+    .community-cta {
+      margin-top: 40px;
+    }
+
+    .community-cta .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .cta-btn {
+      flex: 1 1 180px;
+      text-align: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: var(--card);
+      color: var(--text-main);
+      text-decoration: none;
+      transition:
+        background .15s ease,
+        box-shadow .15s ease,
+        transform .15s ease,
+        border-color .15s ease;
+    }
+
+    .cta-btn-primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #020303;
+      box-shadow: 0 0 20px var(--accent-strong);
+    }
+
+    .cta-btn-primary span {
+      opacity: 0.8;
+      font-weight: 500;
+    }
+
+    .cta-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 26px var(--accent-strong);
+    }
+
+    .cta-btn-outline {
+      background: transparent;
+    }
+
+    .cta-btn-outline:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .cta-btn-alt {
+      border-color: #00c2ff;
+      color: #00c2ff;
+    }
+
+    .cta-btn-alt:hover {
+      background: rgba(0,194,255,0.12);
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -586,6 +652,7 @@
   <a href="#features">Features</a>
   <a href="#roadmap">Roadmap</a>
   <a href="#fees">Fees</a>
+  <a href="#community">Community</a>
   <a href="#faq">FAQ</a>
 </nav>
   </header>
@@ -937,6 +1004,30 @@
               Exact plan will be shared before launch.
             </p>
           </article>
+        </div>
+      </section>
+      <!-- COMMUNITY CTA -->
+      <section id="community" class="community-cta">
+        <div class="section-label">Join early</div>
+        <h2 class="section-title">Be part of the Winky experiment</h2>
+        <p class="section-text">
+          $WINKY is planned as the meme layer around the safety bot. Token contract and launch
+          details will be announced once the basics are tested and live.
+        </p>
+
+        <div class="cta-buttons">
+          <button class="cta-btn cta-btn-primary" type="button" disabled>
+            BUY $WINKY
+            <span> · coming soon</span>
+          </button>
+
+          <a class="cta-btn cta-btn-outline" href="#" target="_blank" rel="noreferrer">
+            Follow on X
+          </a>
+
+          <a class="cta-btn cta-btn-alt" href="#" target="_blank" rel="noreferrer">
+            Join community
+          </a>
         </div>
       </section>
 
