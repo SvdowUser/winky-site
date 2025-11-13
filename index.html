@@ -21,7 +21,9 @@
     * {
       box-sizing: border-box;
     }
-
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -195,6 +197,10 @@
       color: var(--text-muted);
       font-size: 14px;
     }
+    .coming .card {
+      background: radial-gradient(circle at top,
+        rgba(0,255,247,0.18), var(--card));
+    }
 
     .pill-row {
       display: flex;
@@ -328,22 +334,24 @@
       transform-origin: center center;
     }
 
-    .winky-eye.right {
-      animation: winky-blink 10s infinite ease-in-out;
-    }
+.winky-eye.right {
+  /* 14s = noch seltenerer Blink */
+  animation: winky-blink 14s infinite ease-in-out;
+}
 
-    /* Zwinker-Animation nur kurz alle ~10 Sekunden */
-    @keyframes winky-blink {
-      0%, 92%, 100% {
-        transform: scaleY(1) scaleX(1);
-      }
-      94% {
-        transform: scaleY(0.15) scaleX(1.25);
-      }
-      96% {
-        transform: scaleY(1) scaleX(1);
-      }
-    }
+/* Zwinker-Animation: sehr kurz, relativ weich */
+@keyframes winky-blink {
+  0%, 94%, 100% {
+    transform: scaleY(1) scaleX(1);
+  }
+  96% {
+    transform: scaleY(0.12) scaleX(1.3); /* fast komplett zu */
+  }
+  97.5% {
+    transform: scaleY(1) scaleX(1);      /* wieder offen */
+  }
+}
+
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -406,7 +414,40 @@
         </button>
       </div>
     </section>
+<section class="coming">
+      <div class="section-label">Coming soon</div>
+      <h2 class="section-title">What Winky will learn next</h2>
+      <p class="section-text">
+        Winky starts as a simple safety chatbot. Step by step, it becomes a full launch stack
+        for Solana meme creators.
+      </p>
 
+      <div class="cards">
+        <article class="card">
+          <h3>Wallet connect & 1-click launch</h3>
+          <p>
+            Connect your Solana wallet and let Winky prepare a launch transaction template –
+            so you don’t have to touch complex contract UIs.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Telegram & X bots</h3>
+          <p>
+            Launch and track tokens directly from Telegram or X-bot commands, with Winky
+            handling the boring parts in the background.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Leaderboard & rewards</h3>
+          <p>
+            A public board for the strongest Winky launches – with a share of fees flowing
+            back into marketing and community rewards.
+          </p>
+        </article>
+      </div>
+    </section>
     <div class="page">
       <!-- HOW IT WORKS -->
       <section id="how">
