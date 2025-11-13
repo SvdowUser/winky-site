@@ -520,6 +520,37 @@
       pointer-events: none;
       box-shadow: none;
     }
+    /* TOKENOMICS SECTION */
+    .tokenomics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .tokenomics-card {
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.14), var(--card));
+      border-radius: 18px;
+      padding: 16px 18px 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .tokenomics-card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .tokenomics-main {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tokenomics-note {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -858,6 +889,53 @@
               <li>Treasury for CEX listing fees (starting with lower tiers).</li>
               <li>Community rewards, events and leaderboard incentives.</li>
             </ul>
+          </article>
+        </div>
+      </section>
+      <!-- TOKENOMICS (DRAFT) -->
+      <section id="tokenomics">
+        <div class="section-label">Tokenomics (draft)</div>
+        <h2 class="section-title">$WINKY supply & usage</h2>
+        <p class="section-text">
+          Exact numbers can still change. The basic idea: fair supply, no crazy team locks
+          and a treasury that actually gets used for listings, safety tools and memes.
+        </p>
+
+        <div class="tokenomics-grid">
+          <article class="tokenomics-card">
+            <h3>Total supply</h3>
+            <div class="tokenomics-main">1 000 000 000 $WINKY</div>
+            <p class="tokenomics-note">
+              Fixed supply on Solana. No hidden mint functions planned – details will be
+              published before launch.
+            </p>
+          </article>
+
+          <article class="tokenomics-card">
+            <h3>Liquidity & listings</h3>
+            <div class="tokenomics-main">~60%</div>
+            <p class="tokenomics-note">
+              Initial DEX liquidity plus future CEX listings. Idea: most of the supply
+              lives in public markets, not in team wallets.
+            </p>
+          </article>
+
+          <article class="tokenomics-card">
+            <h3>Treasury & ecosystem</h3>
+            <div class="tokenomics-main">~25%</div>
+            <p class="tokenomics-note">
+              Used for Winky development, marketing, leaderboard rewards and CEX listing
+              fees (starting with Tier-3/2).
+            </p>
+          </article>
+
+          <article class="tokenomics-card">
+            <h3>Team & contributors</h3>
+            <div class="tokenomics-main">~15%</div>
+            <p class="tokenomics-note">
+              For builders and early supporters, with simple vesting. No instant mega-dump.
+              Exact plan will be shared before launch.
+            </p>
           </article>
         </div>
       </section>
