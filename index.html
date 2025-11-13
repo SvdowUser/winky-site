@@ -617,6 +617,117 @@
     .cta-btn-alt:hover {
       background: rgba(0,194,255,0.12);
     }
+    /* ---- LAUNCH PANEL ---- */
+    .launch-section {
+      margin-top: 40px;
+    }
+
+    .launch-card {
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.14), var(--card));
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 20px 20px 22px;
+      max-width: 720px;
+    }
+
+    .launch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .launch-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .launch-badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      background: rgba(0,255,247,0.05);
+      white-space: nowrap;
+    }
+
+    .launch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .launch-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .launch-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 10px;
+    }
+
+    .launch-input,
+    .launch-select {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(2,6,12,0.75);
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .launch-input::placeholder {
+      color: rgba(163,171,184,0.7);
+    }
+
+    .launch-input:focus,
+    .launch-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .launch-fees-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .launch-fee-input {
+      max-width: 90px;
+    }
+
+    .launch-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .launch-note {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .launch-note strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -700,21 +811,128 @@
         transparency and simple UX.
       </p>
 
-      <div class="hero-buttons">
-        <button class="btn btn-primary" type="button" onclick="openWinkyFromHero()">
-          Launch with Winky<span>→</span>
-        </button>
-        <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
-          Open chat<span>→</span>
-        </button>
-      </div>
-    </section>
+    <div class="hero-buttons">
+  <a class="btn btn-primary" href="#launch">
+    Launch with Winky<span>→</span>
+  </a>
+  <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
+    Open chat<span>→</span>
+  </button>
+</div>
 
-    <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
-    <div class="page">
+    </section>
 
          <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
     <div class="page">
+
+          <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
+    <div class="page">
+
+      <!-- LAUNCH PANEL -->
+      <section id="launch" class="launch-section">
+        <div class="section-label">Launch</div>
+        <h2 class="section-title">Launch a meme token with Winky</h2>
+        <p class="section-text">
+          Connect your Solana wallet, describe your meme and choose a simple fee split.
+          On-chain launching is still in development – this is the interface Winky will use.
+        </p>
+
+        <div class="launch-card">
+          <div class="launch-header">
+            <div>
+              <div class="launch-title">Token setup</div>
+              <div class="section-text" style="margin: 4px 0 0; font-size: 13px;">
+                Basic parameters for a standard Solana meme launch.
+              </div>
+            </div>
+            <div class="launch-badge">Coming soon · on-chain</div>
+          </div>
+
+          <div class="launch-grid">
+            <div class="launch-field">
+              <span class="launch-label">Token name</span>
+              <input
+                id="launch-name"
+                class="launch-input"
+                type="text"
+                placeholder="e.g. Winky The Watcher"
+              />
+            </div>
+
+            <div class="launch-field">
+              <span class="launch-label">Ticker</span>
+              <input
+                id="launch-ticker"
+                class="launch-input"
+                type="text"
+                placeholder="e.g. WINKY"
+              />
+            </div>
+
+            <div class="launch-field">
+              <span class="launch-label">Initial supply</span>
+              <input
+                id="launch-supply"
+                class="launch-input"
+                type="text"
+                placeholder="e.g. 1 000 000 000"
+              />
+            </div>
+
+            <div class="launch-field">
+              <span class="launch-label">Launch type</span>
+              <select id="launch-type" class="launch-select">
+                <option value="fair">Fair launch (no presale)</option>
+                <option value="presale">Presale + fair launch</option>
+                <option value="custom">Custom (later)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="launch-field" style="margin-top: 8px;">
+            <span class="launch-label">Fee split per launch</span>
+            <div class="launch-fees-row">
+              <input
+                id="fee-creator"
+                class="launch-input launch-fee-input"
+                type="number"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span>% to creator</span>
+
+              <input
+                id="fee-treasury"
+                class="launch-input launch-fee-input"
+                type="number"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span>% to Winky treasury</span>
+            </div>
+          </div>
+
+          <div class="launch-footer">
+            <button
+              class="btn btn-primary"
+              type="button"
+              onclick="previewLaunchConfig()"
+            >
+              Preview launch config<span>→</span>
+            </button>
+            <p class="launch-note">
+              Launch fee idea: <strong>~2 USD</strong> per token launch.
+              Final numbers and on-chain contracts are still in development.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how">
+
 
       <!-- COMING SOON -->
       <section class="coming">
@@ -1183,7 +1401,27 @@
       }
     }
   </script>
-  
+    <script>
+    function previewLaunchConfig() {
+      const name = document.getElementById('launch-name').value || 'Unnamed token';
+      const ticker = document.getElementById('launch-ticker').value || '???';
+      const supply = document.getElementById('launch-supply').value || 'not set';
+      const type = document.getElementById('launch-type').value;
+      const creator = document.getElementById('fee-creator').value || '0';
+      const treasury = document.getElementById('fee-treasury').value || '0';
+
+      alert(
+        'Launch preview:\\n\\n' +
+        'Name: ' + name + '\\n' +
+        'Ticker: ' + ticker + '\\n' +
+        'Supply: ' + supply + '\\n' +
+        'Type: ' + type + '\\n' +
+        'Fee split: ' + creator + '% creator / ' + treasury + '% treasury\\n\\n' +
+        '(On-chain launch coming soon – this is just a UI preview.)'
+      );
+    }
+  </script>
+
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
 </script>
