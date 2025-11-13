@@ -419,6 +419,107 @@
       font-size: 14px;
       color: var(--text-muted);
     }
+    /* --- TOKEN HERO PANEL --- */
+    #token {
+      margin-top: 40px;
+    }
+
+    .token-panel {
+      max-width: 780px;
+      margin: 16px auto 40px;
+      padding: 18px 18px 20px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top,
+        rgba(0,255,247,0.18), var(--card));
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 0 24px rgba(0,255,247,0.12);
+    }
+
+    .token-address-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .token-address-box {
+      background: #05070b;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--text-muted);
+    }
+
+    .token-address-box span {
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .token-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,255,247,0.45);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .token-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .token-metric-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .token-metric-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .token-metric-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+
+    .token-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-wide {
+      flex: 1 1 140px;
+      justify-content: center;
+    }
+
+    .btn-disabled {
+      opacity: 0.45;
+      cursor: default;
+      pointer-events: none;
+      box-shadow: none;
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -449,6 +550,7 @@
       <span>Winky</span>
     </div>
 <nav class="nav-links">
+    <a href="#token">Token</a>
   <a href="#how">How it works</a>
   <a href="#features">Features</a>
   <a href="#roadmap">Roadmap</a>
@@ -522,6 +624,61 @@
               back into marketing and community rewards.
             </p>
           </article>
+        </div>
+      </section>
+      <!-- TOKEN / MEME COIN PANEL -->
+      <section id="token">
+        <div class="section-label">Winky token</div>
+        <h2 class="section-title">$WINKY – coming soon</h2>
+        <p class="section-text">
+          Winky will launch its own meme token on Solana. The token is not live yet –
+          but this is where the contract address and links will appear as soon as it is deployed.
+        </p>
+
+        <div class="token-panel">
+          <!-- Contract address -->
+          <div>
+            <span class="token-address-label">Contract address</span>
+            <div class="token-address-box">
+              <span>Coming soon – not deployed yet</span>
+              <div class="token-pill">SOON</div>
+            </div>
+          </div>
+
+          <!-- Metrics (Platzhalter) -->
+          <div class="token-metrics">
+            <div>
+              <span class="token-metric-label">Market cap</span>
+              <div class="token-metric-value">–</div>
+              <div class="token-metric-note">Updates after launch</div>
+            </div>
+            <div>
+              <span class="token-metric-label">Liquidity</span>
+              <div class="token-metric-value">–</div>
+              <div class="token-metric-note">To be announced</div>
+            </div>
+            <div>
+              <span class="token-metric-label">24h change</span>
+              <div class="token-metric-value">–</div>
+              <div class="token-metric-note">No trading yet</div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="token-actions">
+            <!-- Buy-Button vorerst disabled -->
+            <button class="btn btn-primary btn-wide btn-disabled" type="button">
+              Buy $WINKY (soon)
+            </button>
+
+            <!-- X & Community kannst du später verlinken -->
+            <a class="btn btn-secondary btn-wide" href="https://x.com" target="_blank" rel="noreferrer">
+              Follow on X
+            </a>
+            <a class="btn btn-secondary btn-wide" href="#" target="_blank" rel="noreferrer">
+              Join community
+            </a>
+          </div>
         </div>
       </section>
 
