@@ -352,6 +352,41 @@
   }
 }
 
+    .faq-list {
+      margin-top: 12px;
+      max-width: 720px;
+    }
+
+    .faq-list details {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+
+    .faq-list summary {
+      cursor: pointer;
+      list-style: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .faq-list summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-list details[open] {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 12px var(--accent-soft);
+    }
+
+    .faq-list details p {
+      margin: 8px 0 4px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
 
     @media (max-width: 720px) {
       .fees-grid {
@@ -381,12 +416,13 @@
 
       <span>Winky</span>
     </div>
-    <nav class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#features">Features</a>
-      <a href="#roadmap">Roadmap</a>
-      <a href="#fees">Fees</a>
-    </nav>
+<nav class="nav-links">
+  <a href="#how">How it works</a>
+  <a href="#features">Features</a>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#fees">Fees</a>
+  <a href="#faq">FAQ</a>
+</nav>
   </header>
 
   <!-- HERO -->
@@ -625,6 +661,67 @@
         </div>
       </section>
     </div>
+          <!-- FAQ -->
+      <section id="faq">
+        <div class="section-label">FAQ</div>
+        <h2 class="section-title">Frequently asked questions</h2>
+        <p class="section-text">
+          Winky is experimental and still in development. Here are a few things people usually ask.
+        </p>
+
+        <div class="faq-list">
+          <details>
+            <summary>Is Winky giving financial advice?</summary>
+            <p>
+              No. Winky helps you understand risks and structure safer launches,
+              but nothing on this site is financial, legal or investment advice. Always DYOR.
+            </p>
+          </details>
+
+          <details>
+            <summary>Can Winky guarantee that a token is not a rug?</summary>
+            <p>
+              No. Winky can highlight obvious red flags (like sketchy ownership or liquidity moves),
+              but it can’t guarantee that a token is safe. There is always risk in crypto.
+            </p>
+          </details>
+
+          <details>
+            <summary>Do I need to know how to code to use Winky?</summary>
+            <p>
+              The idea is: no. Winky is built for non-technical meme creators. The bot guides
+              you through naming, branding, basic safety settings and helps you understand each step.
+            </p>
+          </details>
+
+          <details>
+            <summary>How are fees for launches intended to be used?</summary>
+            <p>
+              A small launch fee is planned (for example ~2 USD equivalent). The goal is to recycle
+              most of it into marketing, listings and community rewards for Winky-born tokens.
+            </p>
+          </details>
+
+          <details>
+            <summary>Is Winky already integrated with CEXs like Bitget or others?</summary>
+            <p>
+              Not yet. CEX integrations are part of the later roadmap. Early phases focus on
+              tools, safety and community, then treasury funds can be used to target Tier-3/2 listings.
+            </p>
+          </details>
+
+          <details>
+            <summary>Will I have to give Winky my private key?</summary>
+            <p>
+              Never. Winky should only work with wallet connections where <em>you</em> sign transactions
+              yourself. If any tool ever asks for your seed phrase or private key, it is a scam.
+            </p>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+
   </main>
 
   <!-- FOOTER -->
