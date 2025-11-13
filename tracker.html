@@ -159,11 +159,13 @@
   margin-top: 8px;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.10);
-  overflow: hidden;
   background: radial-gradient(circle at top left,
     rgba(0,255,247,0.08), var(--card));
-  padding-right: 8px;   /* NEU: Platz rechts im Wrapper */
+  padding-right: 16px;      /* Platz rechts für den Button */
+  overflow-y: hidden;       /* unten schön abgerundet lassen */
+  overflow-x: visible;      /* WICHTIG: horizontal NICHT abschneiden */
 }
+
 
 
     table {
