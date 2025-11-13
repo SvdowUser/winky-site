@@ -294,20 +294,21 @@ td:last-child {
       background: rgba(0,255,247,0.06);
     }
 
-    .btn-xs {
-      font-size: 11px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(0,0,0,0.6);
-      color: var(--text-main);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-      margin-right: 2px;
-    }
+.btn-xs {
+  font-size: 11px;
+  padding: 6px 10px;   /* vorher 6px 12px */
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.6);
+  color: var(--text-main);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  margin-right: 2px;
+}
+
 
     .btn-xs:hover { background: rgba(255,255,255,0.06); }
 
@@ -713,11 +714,12 @@ td:last-child {
             </span>
           </td>
           <td>${fromWinky}</td>
-          <td>
-            <a class="btn-xs" href="${t.dexUrl}" target="_blank" rel="noreferrer">
-              View on Birdeye
-            </a>
-          </td>
+       <td>
+  <a class="btn-xs" href="${t.dexUrl}" target="_blank" rel="noreferrer">
+    View
+  </a>
+</td>
+
         </tr>
       `;
     });
