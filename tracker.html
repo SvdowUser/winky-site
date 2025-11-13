@@ -161,8 +161,10 @@
   border: 1px solid rgba(255,255,255,0.10);
   background: radial-gradient(circle at top left,
     rgba(0,255,247,0.08), var(--card));
-  overflow: hidden;           /* alles schön innerhalb der Rundung halten */
+  padding-right: 12px;   /* etwas Platz nach rechts */
+  overflow: hidden;      /* nichts außerhalb der Rundung anzeigen */
 }
+
 
 
 
@@ -181,11 +183,12 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
-    /* etwas extra Platz für die Buttons in der letzten Spalte */
-    th:last-child,
-    td:last-child {
-      padding-right: 32px;
-    }
+/* extra Platz für die Buttons in der letzten Spalte */
+th:last-child,
+td:last-child {
+  padding-right: 40px;   /* vorher 32px – noch ein bisschen mehr Luft */
+}
+
 
     th {
       font-size: 11px;
