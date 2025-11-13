@@ -515,12 +515,16 @@ if (!items.length) {
             item.fdv ||
             0;
 
-          const volume24h =
-            item.volumeH24Usd ||
-            item.v24hUsd ||
-            item.volume24h ||
-            (item.volume && (item.volume.h24 || item.volume["24h"])) ||
-            0;
+        // 24h-Volumen aus Birdeye – unser Fall ist "volume24hUSD"
+const volume24h =
+  item.volume24hUSD ||        // Birdeye trending
+  item.volume24hUsd ||        // evtl. andere Schreibweise
+  item.volumeH24Usd ||
+  item.v24hUsd ||
+  item.volume24h ||
+  (item.volume && (item.volume.h24 || item.volume["24h"])) ||
+  0;
+
 
           const liquidityUsd =
             item.liquidityUsd ||
