@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Winky – Token tracker</title>
+  <title>Winky – Token tracker & risk radar</title>
 
   <style>
     :root {
@@ -16,41 +16,36 @@
       --text-muted: #a3abb8;
       --danger: #ff4d72;
       --green: #7cff4d;
+      --yellow: #ffc94d;
     }
 
     * { box-sizing: border-box; }
-
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: radial-gradient(circle at top, #07121c 0, var(--bg) 55%);
       color: var(--text-main);
     }
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
+    a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* NAVBAR – ähnlich wie auf index.html */
+    /* --- NAV --- */
     .nav {
       max-width: 980px;
       margin: 0 auto;
-      padding: 20px 20px 0;
+      padding: 18px 20px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 14px;
     }
 
-    .nav-brand {
+    .nav-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      gap: 16px;
     }
 
     .nav-links a {
@@ -58,27 +53,63 @@
       color: var(--text-muted);
       font-weight: 500;
     }
-
     .nav-links a:hover {
       color: var(--accent);
     }
 
+    /* Winky eyes logo (wie auf Startseite) */
+    .winky-logo {
+      --size: 28px;
+      display: flex;
+      align-items: center;
+      gap: calc(var(--size) * 0.18);
+    }
+    .winky-eye {
+      width: calc(var(--size) * 0.38);
+      height: calc(var(--size) * 0.38);
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-soft);
+      transform-origin: center center;
+    }
+    .winky-eye.right {
+      animation: winky-blink 14s infinite ease-in-out;
+    }
+    @keyframes winky-blink {
+      0%, 94%, 100% { transform: scaleY(1) scaleX(1); }
+      96% { transform: scaleY(0.12) scaleX(1.3); }
+      97.5% { transform: scaleY(1) scaleX(1); }
+    }
+    .nav-brand-text {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-wallet {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+    .nav-wallet:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 720px) {
+      .nav { flex-wrap: wrap; gap: 10px; }
+      .nav-links { display: none; }
+      .nav-wallet { padding: 6px 12px; font-size: 12px; }
+    }
+
+    /* --- PAGE LAYOUT --- */
     .page {
       max-width: 980px;
       margin: 0 auto 80px;
-      padding: 32px 20px 80px;
-    }
-
-    h1 {
-      font-size: clamp(28px, 4vw, 34px);
-      margin: 0 0 6px;
-    }
-
-    .page-intro {
-      max-width: 640px;
-      color: var(--text-muted);
-      font-size: 15px;
-      margin-bottom: 24px;
+      padding: 0 20px 40px;
     }
 
     .section-label {
@@ -89,178 +120,200 @@
       margin-bottom: 6px;
     }
 
-    /* FILTER BAR */
+    h1.page-title {
+      font-size: clamp(30px, 4vw, 36px);
+      margin: 4px 0 8px;
+    }
 
+    .section-text {
+      margin: 0 0 24px;
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    /* --- FILTER BAR --- */
     .filter-bar {
+      margin-top: 14px;
+      background: var(--card);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 14px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
-      margin-bottom: 20px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: radial-gradient(circle at top left,
-        rgba(0,255,247,0.10), var(--card));
-      border: 1px solid rgba(255,255,255,0.08);
     }
 
-    .filter-input,
+    .filter-input {
+      flex: 1 1 180px;
+      min-width: 160px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(5,8,12,0.7);
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    .filter-input::placeholder {
+      color: rgba(200,210,225,0.7);
+    }
+
     .filter-select {
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(2,6,12,0.8);
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(5,8,12,0.7);
       color: var(--text-main);
       padding: 8px 12px;
       font-size: 13px;
       outline: none;
     }
 
-    .filter-input::placeholder {
-      color: rgba(255,255,255,0.4);
-    }
-
-    .filter-select {
-      padding-right: 28px;
-    }
-
-    .filter-toggle {
+    .filter-checkbox {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 12px;
       color: var(--text-muted);
+      white-space: nowrap;
     }
 
-    .filter-toggle input {
-      accent-color: var(--accent);
+    /* --- TABLE --- */
+    .table-wrapper {
+      margin-top: 24px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.32);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
     }
 
-    /* TOKEN TABLE */
-
-    .token-table {
+    table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
       font-size: 13px;
     }
 
-    .token-table thead {
+    thead {
+      background: rgba(9,14,20,0.98);
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: var(--text-muted);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
-    .token-table th,
-    .token-table td {
-      padding: 10px 10px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.01);
     }
 
-    .token-row {
-      background: rgba(0,0,0,0.35);
+    tbody tr:hover {
+      background: rgba(0,255,247,0.04);
     }
 
-    .token-row:nth-child(2n) {
-      background: rgba(0,0,0,0.5);
-    }
-
-    .token-name {
-      font-weight: 500;
+    .token-main {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
-
     .token-symbol {
       font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
       color: var(--text-muted);
     }
 
-    .badge-risk {
+    .badge {
       display: inline-flex;
       align-items: center;
-      padding: 3px 8px;
+      justify-content: center;
+      padding: 3px 10px;
       border-radius: 999px;
       font-size: 11px;
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.12);
+      white-space: nowrap;
     }
 
-    .badge-low {
-      border-color: rgba(124,255,77,0.7);
+    .badge-risk-low {
+      border-color: rgba(124,255,77,0.6);
       color: var(--green);
+      background: rgba(124,255,77,0.1);
     }
-
-    .badge-med {
-      border-color: rgba(255,206,86,0.8);
-      color: #ffce56;
+    .badge-risk-medium {
+      border-color: rgba(255,201,77,0.7);
+      color: var(--yellow);
+      background: rgba(255,201,77,0.16);
     }
-
-    .badge-high {
-      border-color: rgba(255,77,114,0.8);
+    .badge-risk-high {
+      border-color: rgba(255,77,114,0.6);
       color: var(--danger);
+      background: rgba(255,77,114,0.14);
     }
 
     .badge-winky {
-      display: inline-flex;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      border: 1px solid var(--accent-soft);
+      border-color: rgba(0,255,247,0.7);
       color: var(--accent);
-      background: rgba(0,255,247,0.08);
+      background: rgba(0,255,247,0.12);
     }
 
-    .token-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .btn-link {
-      font-size: 12px;
-      padding: 6px 10px;
+    .btn-table {
+      padding: 7px 12px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(0,0,0,0.4);
+      background: rgba(5,8,12,0.9);
       color: var(--text-main);
-      text-decoration: none;
+      font-size: 12px;
       cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
-    .btn-link:hover {
-      border-color: var(--accent-soft);
-      color: var(--accent);
+    .btn-table:hover {
+      background: rgba(255,255,255,0.06);
     }
 
-    .table-note {
-      margin-top: 10px;
+    .table-footnote {
+      margin-top: 8px;
       font-size: 11px;
       color: var(--text-muted);
     }
 
-    @media (max-width: 800px) {
-      .token-table thead {
-        display: none;
+    .empty-state {
+      padding: 20px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      th:nth-child(4),
+      th:nth-child(5),
+      td:nth-child(4),
+      td:nth-child(5) {
+        display: none; /* Market cap + Volume auf Handy ausblenden */
       }
-      .token-table,
-      .token-table tbody,
-      .token-table tr,
-      .token-table td {
-        display: block;
-        width: 100%;
-      }
-      .token-table tr {
-        margin-bottom: 10px;
-        border-radius: 14px;
-        overflow: hidden;
-      }
-      .token-table td {
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-      }
+    }
+
+    /* FOOTER */
+    .footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px 20px 32px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
   </style>
 </head>
@@ -268,21 +321,29 @@
 <body>
   <!-- NAV -->
   <header class="nav">
-    <div class="nav-brand">
-      <span>🟢🟢</span>
-      <span>Winky</span>
+    <div class="nav-left">
+      <div class="winky-logo">
+        <span class="winky-eye left"></span>
+        <span class="winky-eye right"></span>
+      </div>
+      <span class="nav-brand-text">Winky</span>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="tracker.html">Token tracker</a>
+      </nav>
     </div>
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="tracker.html">Token tracker</a>
-    </nav>
+
+    <button id="wallet-connect-btn" class="nav-wallet" type="button">
+      Connect wallet
+    </button>
   </header>
 
+  <!-- PAGE -->
   <main class="page">
     <div class="section-label">Explorer</div>
-    <h1>Token tracker & risk radar</h1>
-    <p class="page-intro">
+    <h1 class="page-title">Token tracker & risk radar</h1>
+    <p class="section-text">
       View popular Solana meme tokens, basic market data and an early risk score.
       Data is mocked for now – later this page can read live data from Dexscreener
       and from Winky launches.
@@ -291,195 +352,245 @@
     <!-- FILTERS -->
     <div class="filter-bar">
       <input
-        id="filter-search"
+        id="search-input"
         class="filter-input"
         type="text"
-        placeholder="Search by name or ticker..."
+        placeholder="Search by name or ticker…"
       />
 
-      <select id="filter-risk" class="filter-select">
+      <select id="risk-filter" class="filter-select">
         <option value="all">Risk: all</option>
         <option value="low">Risk: low</option>
         <option value="medium">Risk: medium</option>
         <option value="high">Risk: high</option>
       </select>
 
-      <select id="filter-mcap" class="filter-select">
+      <select id="mc-filter" class="filter-select">
         <option value="all">Market cap: all</option>
-        <option value="small">&lt; 1M</option>
-        <option value="mid">1M – 10M</option>
-        <option value="large">&gt; 10M</option>
+        <option value="small">&lt; $1M</option>
+        <option value="mid">$1M – $10M</option>
+        <option value="large">&gt; $10M</option>
       </select>
 
-      <label class="filter-toggle">
-        <input id="filter-winky" type="checkbox" />
+      <label class="filter-checkbox">
+        <input id="winky-only" type="checkbox" />
         Only Winky launches
       </label>
     </div>
 
     <!-- TABLE -->
-    <table class="token-table">
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>Chain</th>
-          <th>Market cap</th>
-          <th>24h volume</th>
-          <th>Risk</th>
-          <th>From Winky</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="token-table-body"></tbody>
-    </table>
+    <div class="table-wrapper" id="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Chain</th>
+            <th>Market cap</th>
+            <th>24h volume</th>
+            <th>Risk</th>
+            <th>From Winky</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="token-tbody">
+          <!-- rows werden per JS eingefügt -->
+        </tbody>
+      </table>
+      <div id="empty-state" class="empty-state" style="display:none;">
+        No tokens found for this filter. Try a different search or risk level.
+      </div>
+    </div>
 
-    <p class="table-note">
+    <p class="table-footnote">
       Risk level and Winky tags are rough previews for now.
-      Bubble maps & on-chain holder analysis can be added later.
+      Bubble maps &amp; on-chain holder analysis can be added later.
+      Live data refresh (e.g. every 5–10 minutes) can be connected once the backend is ready.
     </p>
   </main>
 
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>© 2025 Winky · Experimental Solana meme tooling. DYOR.</span>
+    <span>
+      <a href="index.html">Back to home</a>
+      ·
+      <a href="https://dexscreener.com" target="_blank" rel="noreferrer">Dexscreener</a>
+    </span>
+  </footer>
+
   <script>
-    // --- Mock data (später durch echte Dexscreener-API + dein Backend ersetzbar) ---
-    const TOKENS = [
-      {
-        name: "Winky The Watcher",
-        symbol: "WINKY",
-        chain: "Solana",
-        marketCap: 0,
-        volume24h: 0,
-        risk: "medium",
-        isWinky: true,
-        url: "#"
-      },
-      {
-        name: "Own:Nothing",
-        symbol: "NOTHING",
-        chain: "Solana",
-        marketCap: 1880000,
-        volume24h: 160750,
-        risk: "low",
-        isWinky: false,
-        url: "https://dexscreener.com/solana" // Platzhalter
-      },
-      {
-        name: "Pepe Turbo",
-        symbol: "PEPET",
-        chain: "Solana",
-        marketCap: 4500000,
-        volume24h: 890000,
-        risk: "medium",
-        isWinky: false,
-        url: "https://dexscreener.com/solana"
-      },
-      {
-        name: "Winky Banana",
-        symbol: "WBAN",
-        chain: "Solana",
-        marketCap: 950000,
-        volume24h: 120000,
-        risk: "high",
-        isWinky: true,
-        url: "#"
+    // --- Simple wallet button placeholder (gleich wie auf Startseite anpassbar) ---
+    document.getElementById('wallet-connect-btn')
+      .addEventListener('click', () => {
+        alert('Wallet connect placeholder on tracker page – same logic as index.html can be reused here.');
+      });
+
+    // === Dexscreener integration (client-side demo) ===
+    const API_URL =
+      'https://api.dexscreener.com/latest/dex/search?q=solana'; // einfache Suche nach Solana-Pairs
+
+    let ALL_TOKENS = [];
+
+    async function fetchTokens() {
+      try {
+        const res = await fetch(API_URL);
+        const json = await res.json();
+        const pairs = json.pairs || [];
+
+        // Sortiere nach 24h-Volumen (desc), nimm max. 50
+        pairs.sort((a, b) => (b?.volume?.h24 || 0) - (a?.volume?.h24 || 0));
+        const top = pairs.slice(0, 50);
+
+        ALL_TOKENS = top.map(pair => {
+          const base = pair.baseToken || {};
+          const chain = pair.chainId || 'solana';
+          const mc = pair.fdv || pair.marketCap || null;
+          const vol24 = pair.volume?.h24 ?? null;
+          const liquidityUsd = pair.liquidity?.usd ?? 0;
+
+          const risk = computeRisk(liquidityUsd, mc);
+
+          // TODO: später über Backend markieren, welche Tokens wirklich von Winky gelauncht wurden
+          const isWinkyLaunch = false;
+
+          return {
+            name: base.name || 'Unknown',
+            symbol: base.symbol || '?',
+            chain,
+            marketCap: mc,
+            volume24h: vol24,
+            risk,
+            winkyLaunch: isWinkyLaunch,
+            url: pair.url || 'https://dexscreener.com'
+          };
+        });
+
+        renderTable();
+      } catch (err) {
+        console.error('Error loading Dexscreener data:', err);
+        const tbody = document.getElementById('token-tbody');
+        const empty = document.getElementById('empty-state');
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        empty.textContent =
+          'Could not load live data from Dexscreener (possibly CORS or network issue). ' +
+          'You can still connect this page via a small backend later.';
       }
-    ];
-
-    function formatUSD(n) {
-      if (!n) return "–";
-      if (n >= 1_000_000_000) return "$" + (n/1_000_000_000).toFixed(1) + "B";
-      if (n >= 1_000_000)     return "$" + (n/1_000_000).toFixed(1) + "M";
-      if (n >= 1_000)         return "$" + (n/1_000).toFixed(1) + "k";
-      return "$" + n.toLocaleString();
     }
 
-    function riskClass(risk) {
-      if (risk === "low") return "badge-risk badge-low";
-      if (risk === "high") return "badge-risk badge-high";
-      if (risk === "medium") return "badge-risk badge-med";
-      return "badge-risk";
+    function computeRisk(liquidityUsd, marketCap) {
+      // Sehr simple Heuristik nur als Platzhalter
+      if (!liquidityUsd || liquidityUsd < 5000) return 'high';
+      if (liquidityUsd < 50000) return 'medium';
+      return 'low';
     }
 
-    function riskLabel(risk) {
-      if (risk === "low") return "Low";
-      if (risk === "high") return "High";
-      if (risk === "medium") return "Medium";
-      return "N/A";
-    }
-
-    function mcapBucket(mcap) {
-      if (!mcap) return "all";
-      if (mcap < 1_000_000) return "small";
-      if (mcap <= 10_000_000) return "mid";
-      return "large";
+    function formatUsd(value) {
+      if (value == null) return '–';
+      try {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          notation: 'compact',
+          maximumFractionDigits: 1
+        }).format(value);
+      } catch {
+        return '$' + value.toLocaleString();
+      }
     }
 
     function renderTable() {
-      const tbody = document.getElementById("token-table-body");
-      const search = document.getElementById("filter-search").value.trim().toLowerCase();
-      const risk   = document.getElementById("filter-risk").value;
-      const mcap   = document.getElementById("filter-mcap").value;
-      const onlyWinky = document.getElementById("filter-winky").checked;
+      const tbody = document.getElementById('token-tbody');
+      const empty = document.getElementById('empty-state');
 
-      tbody.innerHTML = "";
+      const search = document.getElementById('search-input').value.trim().toLowerCase();
+      const riskFilter = document.getElementById('risk-filter').value;
+      const mcFilter = document.getElementById('mc-filter').value;
+      const winkyOnly = document.getElementById('winky-only').checked;
 
-      const filtered = TOKENS.filter(t => {
+      const filtered = ALL_TOKENS.filter(t => {
         if (search &&
-            !t.name.toLowerCase().includes(search) &&
-            !t.symbol.toLowerCase().includes(search)) {
+          !(t.name.toLowerCase().includes(search) ||
+            t.symbol.toLowerCase().includes(search))) {
           return false;
         }
-        if (risk !== "all" && t.risk !== risk) return false;
-        if (mcap !== "all" && mcapBucket(t.marketCap) !== mcap) return false;
-        if (onlyWinky && !t.isWinky) return false;
+
+        if (riskFilter !== 'all' && t.risk !== riskFilter) {
+          return false;
+        }
+
+        const mc = t.marketCap || 0;
+        if (mcFilter === 'small' && !(mc > 0 && mc < 1_000_000)) return false;
+        if (mcFilter === 'mid' && !(mc >= 1_000_000 && mc < 10_000_000)) return false;
+        if (mcFilter === 'large' && !(mc >= 10_000_000)) return false;
+
+        if (winkyOnly && !t.winkyLaunch) return false;
+
         return true;
       });
 
-      filtered.forEach(token => {
-        const tr = document.createElement("tr");
-        tr.className = "token-row";
+      if (!filtered.length) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
 
-        tr.innerHTML = `
-          <td>
-            <div class="token-name">
-              <span>${token.name}</span>
-              <span class="token-symbol">$${token.symbol}</span>
-            </div>
-          </td>
-          <td>${token.chain}</td>
-          <td>${formatUSD(token.marketCap)}</td>
-          <td>${formatUSD(token.volume24h)}</td>
-          <td><span class="${riskClass(token.risk)}">${riskLabel(token.risk)}</span></td>
-          <td>${token.isWinky ? '<span class="badge-winky">Winky launch</span>' : '—'}</td>
-          <td>
-            <div class="token-actions">
-              <a class="btn-link" href="${token.url}" target="_blank" rel="noreferrer">
+      empty.style.display = 'none';
+      tbody.innerHTML = filtered.map(t => {
+        const riskClass =
+          t.risk === 'low' ? 'badge-risk-low'
+          : t.risk === 'medium' ? 'badge-risk-medium'
+          : 'badge-risk-high';
+
+        const winkyCell = t.winkyLaunch
+          ? '<span class="badge badge-winky">Winky launch</span>'
+          : '—';
+
+        return `
+          <tr>
+            <td>
+              <div class="token-main">
+                <span>${escapeHtml(t.name)}</span>
+                <span class="token-symbol">$${escapeHtml(t.symbol)}</span>
+              </div>
+            </td>
+            <td>${escapeHtml(t.chain)}</td>
+            <td>${formatUsd(t.marketCap)}</td>
+            <td>${formatUsd(t.volume24h)}</td>
+            <td><span class="badge ${riskClass}">
+              ${t.risk.charAt(0).toUpperCase() + t.risk.slice(1)}
+            </span></td>
+            <td>${winkyCell}</td>
+            <td>
+              <a class="btn-table" href="${t.url}" target="_blank" rel="noreferrer">
                 View on Dexscreener
               </a>
-            </div>
-          </td>
+            </td>
+          </tr>
         `;
-
-        tbody.appendChild(tr);
-      });
+      }).join('');
     }
 
-    // Filter Events
-    document.addEventListener("DOMContentLoaded", () => {
-      ["filter-search","filter-risk","filter-mcap","filter-winky"]
-        .forEach(id => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.addEventListener("input", renderTable);
-          el.addEventListener("change", renderTable);
-        });
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-      renderTable();
-    });
+    // Filter-Events
+    document.getElementById('search-input').addEventListener('input', renderTable);
+    document.getElementById('risk-filter').addEventListener('change', renderTable);
+    document.getElementById('mc-filter').addEventListener('change', renderTable);
+    document.getElementById('winky-only').addEventListener('change', renderTable);
 
-    // --- Später: hier könnte man live Daten von Dexscreener laden ---
-    // fetch("https://api.dexscreener.com/latest/dex/tokens/...")
-    //   .then(r => r.json())
-    //   .then(data => { /* TOKENS = aus API befüllen, dann renderTable() aufrufen */ });
+    // Alle paar Minuten könnte man neu laden (hier nur vorbereitet)
+    // setInterval(fetchTokens, 5 * 60 * 1000);
+
+    // Initial load
+    fetchTokens();
   </script>
 </body>
 </html>
