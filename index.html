@@ -276,7 +276,123 @@
       grid-template-columns: minmax(0,1.1fr) minmax(0,1fr);
       gap: 16px;
     }
+/* === Launch setup (simple fee slider) === */
 
+.launch-card {
+  margin-top: 24px;
+  background: radial-gradient(circle at top left,
+    rgba(0,255,247,0.12), var(--card));
+  border-radius: 18px;
+  padding: 20px 20px 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.launch-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.launch-tag {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+.launch-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-soft);
+  color: var(--accent);
+  background: rgba(0,255,247,0.08);
+}
+
+.launch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.launch-field-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.launch-input {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.3);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.launch-input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+.launch-fee-row {
+  margin-top: 18px;
+}
+
+.launch-fee-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.launch-fee-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.launch-fee-value {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.launch-fee-range {
+  width: 100%;
+}
+
+.launch-fee-range input[type="range"] {
+  width: 100%;
+}
+
+.launch-fee-note {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.launch-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.launch-helper-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
     .list {
       margin: 8px 0 0;
       padding-left: 18px;
@@ -963,107 +1079,81 @@
           <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
     <div class="page">
 
-      <!-- LAUNCH PANEL -->
-      <section id="launch" class="launch-section">
+           <!-- LAUNCH / TOKEN SETUP -->
+      <section id="token">
         <div class="section-label">Launch</div>
         <h2 class="section-title">Launch a meme token with Winky</h2>
         <p class="section-text">
-          Connect your Solana wallet, describe your meme and choose a simple fee split.
+          Connect your Solana wallet, describe your meme and choose a simple fee.
           On-chain launching is still in development – this is the interface Winky will use.
         </p>
 
-        <div class="launch-card">
-          <div class="launch-header">
-            <div>
-              <div class="launch-title">Token setup</div>
-              <div class="section-text" style="margin: 4px 0 0; font-size: 13px;">
-                Basic parameters for a standard Solana meme launch.
-              </div>
-            </div>
-            <div class="launch-badge">Coming soon · on-chain</div>
+        <article class="launch-card">
+          <div class="launch-top-row">
+            <span class="launch-tag">Token setup</span>
+            <span class="launch-badge">Coming soon · on-chain</span>
           </div>
 
           <div class="launch-grid">
-            <div class="launch-field">
-              <span class="launch-label">Token name</span>
-              <input
-                id="launch-name"
-                class="launch-input"
-                type="text"
-                placeholder="e.g. Winky The Watcher"
-              />
+            <div>
+              <div class="launch-field-label">Token name</div>
+              <input class="launch-input"
+                     type="text"
+                     placeholder="e.g. Winky The Watcher" />
             </div>
 
-            <div class="launch-field">
-              <span class="launch-label">Ticker</span>
-              <input
-                id="launch-ticker"
-                class="launch-input"
-                type="text"
-                placeholder="e.g. WINKY"
-              />
+            <div>
+              <div class="launch-field-label">Ticker</div>
+              <input class="launch-input"
+                     type="text"
+                     placeholder="e.g. WINKY" />
             </div>
 
-            <div class="launch-field">
-              <span class="launch-label">Initial supply</span>
-              <input
-                id="launch-supply"
-                class="launch-input"
-                type="text"
-                placeholder="e.g. 1 000 000 000"
-              />
-            </div>
-
-            <div class="launch-field">
-              <span class="launch-label">Launch type</span>
-              <select id="launch-type" class="launch-select">
-                <option value="fair">Fair launch (no presale)</option>
-                <option value="presale">Presale + fair launch</option>
-                <option value="custom">Custom (later)</option>
-              </select>
+            <div>
+              <div class="launch-field-label">Initial supply</div>
+              <input class="launch-input"
+                     type="text"
+                     placeholder="e.g. 1 000 000 000" />
             </div>
           </div>
 
-          <div class="launch-field" style="margin-top: 8px;">
-            <span class="launch-label">Fee split per launch</span>
-            <div class="launch-fees-row">
-              <input
-                id="fee-creator"
-                class="launch-input launch-fee-input"
-                type="number"
-                min="0"
-                max="100"
-                value="50"
-              />
-              <span>% to creator</span>
-
-              <input
-                id="fee-treasury"
-                class="launch-input launch-fee-input"
-                type="number"
-                min="0"
-                max="100"
-                value="50"
-              />
-              <span>% to Winky treasury</span>
+          <div class="launch-fee-row">
+            <div class="launch-fee-header">
+              <span class="launch-fee-label">Launch fee per trade</span>
+              <span class="launch-fee-value" id="fee-display">
+                2% total · 1% creator · 1% prize pool
+              </span>
             </div>
-          </div>
-
-          <div class="launch-footer">
-            <button
-              class="btn btn-primary"
-              type="button"
-              onclick="previewLaunchConfig()"
-            >
-              Preview launch config<span>→</span>
-            </button>
-            <p class="launch-note">
-              Launch fee idea: <strong>~2 USD</strong> per token launch.
-              Final numbers and on-chain contracts are still in development.
+            <div class="launch-fee-range">
+              <input
+                id="fee-range"
+                type="range"
+                min="0"
+                max="10"
+                step="0.5"
+                value="2"
+              />
+            </div>
+            <p class="launch-fee-note">
+              You can choose up to <strong>10% total fee</strong>.
+              Whatever you pick is split automatically:
+              <strong>50% to the meme creator</strong> and
+              <strong>50% to the Winky prize pool</strong>.
             </p>
           </div>
-        </div>
+
+          <div class="launch-actions">
+            <button class="btn btn-primary" type="button">
+              Preview launch config<span>→</span>
+            </button>
+            <span class="launch-helper-text">
+              Launch fee idea: ~2 USD per token launch. Final numbers and
+              contracts are still in development.
+            </span>
+          </div>
+        </article>
       </section>
+
 
       <!-- HOW IT WORKS -->
       <section id="how">
@@ -1740,6 +1830,30 @@
     closeLaunchModal();
   }
 </script>
+  <script>
+    // Simple fee slider: 0–10%, always 50/50 split
+    function updateFeeDisplay() {
+      const range = document.getElementById('fee-range');
+      const label = document.getElementById('fee-display');
+      if (!range || !label) return;
+
+      const total = parseFloat(range.value || '0');
+      const half = (total / 2).toFixed(1).replace('.0',''); // hübscher
+      const totalPretty = total.toFixed(1).replace('.0','');
+
+      label.textContent =
+        totalPretty + '% total · ' +
+        half + '% creator · ' +
+        half + '% prize pool';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const range = document.getElementById('fee-range');
+      if (!range) return;
+      range.addEventListener('input', updateFeeDisplay);
+      updateFeeDisplay();
+    });
+  </script>
 
 <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
