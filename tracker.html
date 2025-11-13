@@ -451,13 +451,29 @@
         if (!res.ok) throw new Error("HTTP " + res.status);
         const json = await res.json();
 
-        let items = [];
-        if (Array.isArray(json.data)) items = json.data;
-        else if (json.data && Array.isArray(json.data.tokens)) items = json.data.tokens;
-        else if (json.data && Array.isArray(json.data.content)) items = json.data.content;
-        else if (Array.isArray(json.tokens)) items = json.tokens;
+     // Birdeye kommt über den Worker als: { success, status, data: { data: { tokens: [...] } } }
+let items = [];
 
-        if (!items.length) throw new Error("No items in response");
+let inner = json.data;
+if (inner && inner.data) {
+  // unsere Tokens liegen in json.data.data.tokens
+  inner = inner.data;
+}
+
+if (Array.isArray(inner)) {
+  items = inner;
+} else if (inner && Array.isArray(inner.tokens)) {
+  items = inner.tokens;
+} else if (inner && Array.isArray(inner.content)) {
+  items = inner.content;
+} else if (Array.isArray(json.tokens)) {
+  items = json.tokens;
+}
+
+if (!items.length) {
+  throw new Error("No items in response");
+}
+
 
         const tokens = items.map((item, index) => {
           const name =
