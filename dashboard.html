@@ -345,9 +345,10 @@
       
       <a href="index.html#faq">FAQ</a>
     </nav>
-    <button id="wallet-connect-btn" class="nav-wallet" type="button" onclick="connectWinkyWallet()">
-      Connect wallet
-    </button>
+<button id="wallet-button" class="nav-wallet" type="button">
+  Connect wallet
+</button>
+
   </header>
 
   <main>
@@ -454,35 +455,67 @@
   </footer>
 
   <!-- Wallet connect (gleich wie auf index.html) -->
-  <script>
-    function getSolanaProvider() {
-      if (window.phantom && window.phantom.solana) return window.phantom.solana;
-      if (window.solflare) return window.solflare;
-      if (window.backpack) return window.backpack;
-      if (window.solana && window.solana.isPhantom) return window.solana;
-      return null;
+ <script>
+  // gleicher Key wie auf index.html & portfolio.html
+  const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
+
+  function shortAddress(addr) {
+    if (!addr || addr.length < 8) return addr || "";
+    return addr.slice(0, 4) + "..." + addr.slice(-4);
+  }
+
+  function getSolanaProvider() {
+    if (window.phantom && window.phantom.solana) return window.phantom.solana;
+    if (window.solflare) return window.solflare;
+    if (window.backpack) return window.backpack;
+    if (window.solana && window.solana.isPhantom) return window.solana;
+    return null;
+  }
+
+  async function connectWinkyWallet() {
+    const btn = document.getElementById("wallet-button");
+    const provider = getSolanaProvider();
+
+    if (!provider) {
+      alert("No Solana wallet detected. Please install Phantom or another Solana wallet.");
+      window.open("https://phantom.app/", "_blank");
+      return;
     }
 
-    async function connectWinkyWallet() {
-      const btn = document.getElementById('wallet-connect-btn');
-      const provider = getSolanaProvider();
+    try {
+      btn.disabled = true;
+      btn.textContent = "Connecting…";
 
-      if (!provider) {
-        alert('No Solana wallet detected. Please install Phantom or another Solana wallet.');
-        return;
-      }
+      const resp = await provider.connect();
+      const pubkey = (resp.publicKey || provider.publicKey).toString();
 
-      try {
-        const resp = await provider.connect();
-        const pubkey = (resp.publicKey || provider.publicKey).toString();
-        const short = pubkey.slice(0, 4) + '...' + pubkey.slice(-4);
-        btn.textContent = 'Connected: ' + short;
-        btn.dataset.address = pubkey;
-      } catch (err) {
-        console.log('Wallet connect cancelled or failed:', err);
-      }
+      // zentral speichern, damit index/portfolio/dashboard dieselbe Wallet sehen
+      localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+
+      btn.textContent = shortAddress(pubkey);
+    } catch (err) {
+      console.error("Wallet connect cancelled or failed:", err);
+      const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
+    } finally {
+      btn.disabled = false;
     }
-  </script>
+  }
+
+  function initDashboardWalletButton() {
+    const btn = document.getElementById("wallet-button");
+    if (!btn) return;
+
+    btn.addEventListener("click", connectWinkyWallet);
+
+    // Falls die Wallet schon auf index/portfolio verbunden wurde
+    const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+    btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
+  }
+
+  document.addEventListener("DOMContentLoaded", initDashboardWalletButton);
+</script>
+
 
   <!-- Prize pool: fetch balance of 2mAqREiit4L2qXcbvEYi7kgY7yQT2zve3P4Pe9h7CN1P -->
   <script>
