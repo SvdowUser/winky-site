@@ -172,6 +172,70 @@
       font-size: 15px;
       max-width: 640px;
     }
+    /* --- FEES & POOLS FLOW DIAGRAM --- */
+.fees-flow {
+  margin-top: 18px;
+}
+
+.fees-flow-source {
+  background: radial-gradient(circle at top left,
+    rgba(0,255,247,0.16), var(--card));
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+}
+
+.fees-flow-source-amount {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.fees-flow-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.fees-flow-box {
+  background: radial-gradient(circle at top left,
+    rgba(0,255,247,0.10), var(--card));
+  border-radius: 18px;
+  padding: 14px 16px 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+}
+
+.fees-flow-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fees-flow-pill {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.fees-flow-list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.fees-flow-list li + li {
+  margin-top: 3px;
+}
+
 
     .cards {
       display: grid;
@@ -1434,6 +1498,16 @@
           </article>
         </div>
       </section>
+              </section> <!-- Ende FEES -->
+
+      <!-- FEES & POOLS FLOW (NEU EINBAUEN) -->
+      <section id="fees-pools">
+        ...
+      </section>
+
+      <section id="tokenomics">  <!-- EXISTIERT BEREITS -->
+        <div class="section-label">Tokenomics (draft)</div>
+
       <!-- TOKENOMICS (DRAFT) -->
       <section id="tokenomics">
         <div class="section-label">Tokenomics (draft)</div>
