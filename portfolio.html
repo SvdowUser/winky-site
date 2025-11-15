@@ -385,7 +385,7 @@
       <h1 class="section-title">Your Solana wallet</h1>
       <p class="section-text">
         Connect your wallet to see a simple overview of your SPL tokens.
-        Balances come live from a Solana RPC node in real time.
+        Balances come live from your SPL token accounts in real time.
       </p>
 
       <div class="wallet-card" id="wallet-card">
@@ -482,11 +482,12 @@
     // ==============================
     const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
 
-    // Wenn du später deine echte WINKY-Mint hast, HIER eintragen:
-    // z.B. const WINKY_MINT = "AbCdEF...";
-    const WINKY_MINT = ""; // momentan leer → Staking zeigt 0 an
+    // Deine zukünftige WINKY-Mint:
+    const WINKY_MINT = ""; // später ausfüllen
 
-    const SOLANA_RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
+    // Hier DEINE Worker-URL:
+    const PORTFOLIO_WORKER_URL =
+      "https://portfolio-rpc-workerjs.christopher-milosch.workers.dev";
 
     // ==============================
     // WALLET BUTTON (Phantom)
@@ -494,7 +495,7 @@
 
     function shortAddress(addr) {
       if (!addr || addr.length < 8) return addr || "";
-      return addr.slice(0,4) + "…" + addr.slice(-4);
+      return addr.slice(0, 4) + "…" + addr.slice(-4);
     }
 
     function updateWalletUi(address) {
@@ -536,7 +537,6 @@
       btn.addEventListener("click", async () => {
         const stored = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
         if (stored) {
-          // später evtl. kleines Menü (disconnect etc.)
           return;
         }
         const connected = await connectWallet();
@@ -547,7 +547,6 @@
         }
       });
 
-      // initial state: check localStorage and Phantom
       let addr = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
       if (!addr && window.solana && window.solana.isConnected && window.solana.publicKey) {
         addr = window.solana.publicKey.toString();
@@ -558,7 +557,7 @@
     }
 
     // ==============================
-    // PORTFOLIO – direkt vom Solana RPC
+    // PORTFOLIO via WORKER
     // ==============================
 
     function formatAmount(num) {
@@ -570,35 +569,25 @@
 
     function shortenMint(addr) {
       if (!addr || addr.length < 8) return addr || "";
-      return addr.slice(0,4) + "…" + addr.slice(-4);
+      return addr.slice(0, 4) + "…" + addr.slice(-4);
     }
 
-    async function fetchTokenAccountsFromRpc(walletAddress) {
-      const body = {
-        jsonrpc: "2.0",
-        id: 1,
-        method: "getTokenAccountsByOwner",
-        params: [
-          walletAddress,
-          { programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
-          { encoding: "jsonParsed" }
-        ]
-      };
-
-      const res = await fetch(SOLANA_RPC_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-
+    async function fetchTokenAccountsFromWorker(walletAddress) {
+      const url = `${PORTFOLIO_WORKER_URL}?wallet=${encodeURIComponent(walletAddress)}`;
+      const res = await fetch(url);
       if (!res.ok) {
-        throw new Error("Solana RPC HTTP " + res.status);
+        throw new Error("Worker HTTP " + res.status);
       }
       const json = await res.json();
-      if (!json.result || !Array.isArray(json.result.value)) {
-        return [];
+      if (!json.success) {
+        throw new Error(json.message || "Worker returned success=false");
       }
-      return json.result.value;
+      const tokens = Array.isArray(json.tokens)
+        ? json.tokens
+        : json.data && Array.isArray(json.data.tokens)
+        ? json.data.tokens
+        : [];
+      return tokens;
     }
 
     async function loadPortfolio(walletAddress) {
@@ -607,12 +596,12 @@
       if (!tbody) return;
 
       tbody.innerHTML =
-        '<tr class="table-message-row"><td colspan="2">Loading portfolio from Solana RPC…</td></tr>';
+        '<tr class="table-message-row"><td colspan="2">Loading portfolio from worker…</td></tr>';
       if (stakingAvailEl) stakingAvailEl.textContent = "0";
 
       try {
-        const accounts = await fetchTokenAccountsFromRpc(walletAddress);
-        if (!accounts.length) {
+        const tokensArr = await fetchTokenAccountsFromWorker(walletAddress);
+        if (!tokensArr.length) {
           tbody.innerHTML =
             '<tr class="table-message-row"><td colspan="2">No SPL token accounts found for this wallet.</td></tr>';
           return;
@@ -620,32 +609,17 @@
 
         let winkyBalance = 0;
 
-        // Map in ein einfaches Objekt: { mint, amount }
-        const mapped = accounts.map((acc) => {
-          const pubkey = acc.pubkey;
-          const info = acc.account?.data?.parsed?.info;
-          const mint = info?.mint || pubkey || "Unknown";
-
-          const tokenAmount = info?.tokenAmount;
-          let uiAmount = 0;
-
-          if (tokenAmount) {
-            // wenn uiAmount verfügbar: nehmen
-            if (typeof tokenAmount.uiAmount === "number") {
-              uiAmount = tokenAmount.uiAmount;
-            } else if (tokenAmount.amount != null && tokenAmount.decimals != null) {
-              uiAmount = Number(tokenAmount.amount) / Math.pow(10, tokenAmount.decimals);
-            }
-          }
+        const mapped = tokensArr.map((t) => {
+          const mint = t.mint;
+          const amount = t.amount || 0;
 
           if (WINKY_MINT && mint === WINKY_MINT) {
-            winkyBalance = uiAmount || 0;
+            winkyBalance = amount || 0;
           }
 
-          return { mint, amount: uiAmount };
+          return { mint, amount };
         });
 
-        // sortiere nach Amount absteigend
         mapped.sort((a, b) => (b.amount || 0) - (a.amount || 0));
 
         const rows = mapped.map((t) => {
@@ -673,7 +647,9 @@
         tbody.innerHTML = rows.join("");
 
         if (stakingAvailEl) {
-          stakingAvailEl.textContent = winkyBalance ? winkyBalance.toFixed(4) : "0";
+          stakingAvailEl.textContent = winkyBalance
+            ? winkyBalance.toFixed(4)
+            : "0";
         }
       } catch (err) {
         console.error("Portfolio load failed:", err);
