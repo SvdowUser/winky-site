@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Winky – Launch a token</title>
+
+  <style>
+    :root {
+      --bg: #050608;
+      --card: #0b0f14;
+      --accent: #00fff7;
+      --accent-soft: rgba(0,255,247,0.12);
+      --accent-strong: rgba(0,255,247,0.25);
+      --text-main: #f7f7f7;
+      --text-muted: #a3abb8;
+      --danger: #ff4d72;
+      --green: #7cff4d;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: radial-gradient(circle at top, #07121c 0, var(--bg) 60%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAVBAR – wie Portfolio */
+    .nav {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 20px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-soft);
+    }
+
+    .nav-brand {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links a {
+      margin-left: 18px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active { color: var(--accent); }
+
+    .wallet-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 12px;
+      color: var(--text-main);
+      background: rgba(0,0,0,0.55);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .wallet-pill.disconnected { color: var(--text-muted); }
+
+    /* GENERISCHE BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: rgba(0,0,0,0.45);
+      color: var(--text-main);
+      text-decoration: none;
+      transition: background .15s, box-shadow .15s, transform .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #020303;
+      box-shadow: 0 0 16px var(--accent-strong);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 22px var(--accent-strong);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-1px);
+    }
+
+    /* PAGE WRAPPER */
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      flex: 1 0 auto;
+    }
+
+    section { margin-top: 32px; }
+
+    .section-label {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: 26px;
+      margin: 0 0 10px;
+    }
+
+    .section-text {
+      margin: 0 0 20px;
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    /* FORM CARD */
+    .launch-card {
+      margin-top: 12px;
+      padding: 18px 18px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: radial-gradient(circle at top left,
+        rgba(0,255,247,0.10), var(--card));
+    }
+
+    .launch-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px 18px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(2,6,12,0.8);
+      color: var(--text-main);
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: rgba(255,255,255,0.40);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 70px;
+      max-height: 180px;
+    }
+
+    .form-help {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .launch-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .status-pill {
+      margin-top: 10px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      background: rgba(0,0,0,0.55);
+      color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .status-pill.ok {
+      color: var(--green);
+      border-color: rgba(124,255,77,0.5);
+    }
+    .status-pill.error {
+      color: var(--danger);
+      border-color: rgba(255,77,114,0.5);
+    }
+
+    /* AI ART PREVIEW */
+    .ai-art-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .nav { padding-inline: 14px; }
+      .page { padding-inline: 14px; }
+      .launch-grid { grid-template-columns: minmax(0,1fr); }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-dots">
+        <span class="nav-dot"></span>
+        <span class="nav-dot"></span>
+      </div>
+      <span class="nav-brand">Winky</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="tracker.html">Token tracker</a>
+      <a href="launch.html" class="active">Launch</a>
+    </nav>
+    <button id="wallet-button" class="wallet-pill disconnected">
+      Connect wallet
+    </button>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="page">
+    <section>
+      <div class="section-label">Launcher</div>
+      <h1 class="section-title">Launch a Solana meme token</h1>
+      <p class="section-text">
+        The Winky launcher will help you spin up a fun meme token as fast as possible.
+        For now, this is a <strong>pre-launch UI</strong>: it collects your idea,
+        connects your wallet and then sends you over to Pump.fun.
+        Later, the Winky bot will create and list the token for you in one click.
+      </p>
+
+      <div class="launch-card">
+        <form id="launch-form">
+          <div class="launch-grid">
+            <div class="form-field">
+              <label class="form-label" for="token-name">Token name</label>
+              <input id="token-name" class="form-input" type="text"
+                     placeholder="Example: NanoBanana" required />
+              <div class="form-help">
+                The full name of your token. Fun, short and memeable.
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="token-symbol">Symbol / Ticker</label>
+              <input id="token-symbol" class="form-input" type="text"
+                     placeholder="Example: $NANA" maxlength="10" required />
+              <div class="form-help">
+                3–6 characters usually work best. Will be your on-chain ticker.
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="token-idea">Idea & story</label>
+              <textarea id="token-idea" class="form-textarea"
+                placeholder="Describe your meme, lore and why this token should exist…"
+              ></textarea>
+              <div class="form-help">
+                This text helps Winky (and later the AI) to generate good banners &amp; copy.
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="image-prompt">Art prompt (banner / PFP)</label>
+              <textarea id="image-prompt" class="form-textarea"
+                placeholder="Example: 'hyper-cute 3D banana astronaut in a neon space suit, teal background'"
+              ></textarea>
+              <div class="form-help">
+                Later this prompt will be sent to Google AI Studio to create a banner &amp; PFP.
+                For now it is just saved next to your launch idea.
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="fee-split">Fee split</label>
+              <select id="fee-split" class="form-select">
+                <option value="0">No fees (just vibes)</option>
+                <option value="1">1% – light fees</option>
+                <option value="2">2% – normal Winky split</option>
+                <option value="3">3% – spicy degen mode</option>
+              </select>
+              <div class="form-help">
+                This is the trading fee that will later be split between you and the Winky pools.
+                Exact maths will be documented before launch.
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="social-x">X / Twitter handle</label>
+              <input id="social-x" class="form-input" type="text"
+                     placeholder="@youraccount (optional)" />
+              <div class="form-help">
+                Optional. Helps us (and future leaderboards) to link the token to you.
+              </div>
+            </div>
+          </div>
+
+          <div class="launch-actions">
+            <button type="submit" class="btn btn-primary">
+              Prepare launch (preview)
+            </button>
+            <button type="button" class="btn btn-secondary" id="open-pumpfun-btn">
+              Open Pump.fun
+            </button>
+          </div>
+
+          <div id="launch-status" class="status-pill">
+            Waiting for input. Connect your wallet and fill out the form.
+          </div>
+
+          <div class="ai-art-note">
+            Later, Winky will also generate banner &amp; profile pictures automatically
+            from your <strong>Art prompt</strong> using Google AI Studio.  
+            This will also power Telegram and X bots, so you can launch straight from chat.
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ==============================
+    // SHARED WALLET LOGIC
+    // ==============================
+
+    const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
+
+    function shortAddress(addr) {
+      if (!addr || addr.length < 8) return addr || "";
+      return addr.slice(0,4) + "…" + addr.slice(-4);
+    }
+
+    function updateWalletUi(address) {
+      const btn = document.getElementById("wallet-button");
+      if (!btn) return;
+
+      if (address) {
+        btn.classList.remove("disconnected");
+        btn.textContent = shortAddress(address);
+      } else {
+        btn.classList.add("disconnected");
+        btn.textContent = "Connect wallet";
+      }
+    }
+
+    async function connectWallet() {
+      const provider = window.solana;
+      if (!provider || !provider.isPhantom) {
+        alert("Please install the Phantom wallet extension to connect.");
+        return null;
+      }
+
+      try {
+        const resp = await provider.connect();
+        const pubkey = resp.publicKey.toString();
+        localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+        updateWalletUi(pubkey);
+        return pubkey;
+      } catch (e) {
+        console.error("Wallet connect failed:", e);
+        return null;
+      }
+    }
+
+    function initWalletButton() {
+      const btn = document.getElementById("wallet-button");
+      if (!btn) return null;
+
+      btn.addEventListener("click", async () => {
+        const stored = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+        if (stored) {
+          // später evtl. Menü (disconnect usw.)
+          return;
+        }
+        const connected = await connectWallet();
+        if (!connected) return;
+      });
+
+      let addr = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      if (!addr && window.solana && window.solana.isConnected && window.solana.publicKey) {
+        addr = window.solana.publicKey.toString();
+        localStorage.setItem(WINKY_WALLET_STORAGE_KEY, addr);
+      }
+      updateWalletUi(addr);
+      return addr;
+    }
+
+    // ==============================
+    // LAUNCHER LOGIK (PREVIEW)
+    // ==============================
+
+    function setStatus(text, type) {
+      const el = document.getElementById("launch-status");
+      if (!el) return;
+      el.textContent = text;
+      el.classList.remove("ok", "error");
+      if (type === "ok") el.classList.add("ok");
+      if (type === "error") el.classList.add("error");
+    }
+
+    function initLauncher() {
+      const form = document.getElementById("launch-form");
+      const pumpBtn = document.getElementById("open-pumpfun-btn");
+
+      if (!form) return;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // 1) Wallet check
+        let wallet = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+        if (!wallet) {
+          setStatus("No wallet connected – please connect first.", "error");
+          wallet = await connectWallet();
+          if (!wallet) return;
+        }
+
+        // 2) Read form values
+        const name       = document.getElementById("token-name").value.trim();
+        const symbol     = document.getElementById("token-symbol").value.trim();
+        const idea       = document.getElementById("token-idea").value.trim();
+        const artPrompt  = document.getElementById("image-prompt").value.trim();
+        const feeSplit   = document.getElementById("fee-split").value;
+        const socialX    = document.getElementById("social-x").value.trim();
+
+        if (!name || !symbol) {
+          setStatus("Please fill in at least name and symbol.", "error");
+          return;
+        }
+
+        // 3) Build payload for future backend
+        const launchPayload = {
+          wallet,
+          name,
+          symbol,
+          idea,
+          artPrompt,
+          feeSplit,
+          socialX,
+          source: "winky-web-launcher-v0"
+        };
+
+        console.log("Launch payload (preview):", launchPayload);
+
+        // TODO: später hier deinen Worker / Backend aufrufen:
+        // const res = await fetch("https://DEIN-LAUNCH-WORKER.workers.dev/create", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify(launchPayload),
+        // });
+        // const json = await res.json();
+        // → dann z.B. Pump.fun Link, TX-Signature, Leaderboard-Infos zurückgeben.
+
+        setStatus(
+          "Launch prepared in preview mode. We logged your idea in the console. " +
+          "Next step: open Pump.fun and create the token manually. Later Winky will do this step for you.",
+          "ok"
+        );
+      });
+
+      if (pumpBtn) {
+        pumpBtn.addEventListener("click", () => {
+          // aktuell einfach Pump.fun öffnen – später evtl. mit Parametern
+          window.open("https://pump.fun", "_blank");
+        });
+      }
+    }
+
+    // ==============================
+    // INIT
+    // ==============================
+    document.addEventListener("DOMContentLoaded", () => {
+      initWalletButton();
+      initLauncher();
+    });
+  </script>
+</body>
+</html>
