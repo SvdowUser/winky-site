@@ -374,7 +374,6 @@
     @media (max-width: 768px) {
       .nav { padding-inline: 14px; }
       .page { padding-inline: 14px; }
-      /* nur Token / Amount / Market cap auf Mobile */
     }
   </style>
 </head>
@@ -403,6 +402,7 @@
 
   <!-- PAGE CONTENT -->
   <main class="page">
+    <!-- PORTFOLIO SECTION -->
     <section>
       <div class="section-label">Portfolio</div>
       <h1 class="section-title">Your Solana wallet</h1>
@@ -443,59 +443,59 @@
       <p class="table-footer-note">
         Market cap values are rough indicators only – always double-check before you trade.
       </p>
+    </section>
 
-      <!-- STAKING -->
-      <section class="staking-section">
-        <div class="section-label">Staking preview</div>
-        <h2 class="section-title">Stake your $WINKY</h2>
-        <p class="section-text">
-          Holders will later be able to stake $WINKY and earn a share of the holder reward pool.
-          This is a UI preview – no real transactions are sent yet.
-        </p>
+    <!-- STAKING SECTION -->
+    <section class="staking-section">
+      <div class="section-label">Staking preview</div>
+      <h2 class="section-title">Stake your $WINKY</h2>
+      <p class="section-text">
+        Holders will later be able to stake $WINKY and earn a share of the holder reward pool.
+        This is a UI preview – no real transactions are sent yet.
+      </p>
 
-        <div class="staking-card">
-          <div class="staking-header">
-            <div class="staking-title">$WINKY staking overview</div>
-            <div class="staking-tag">Coming soon · on-chain</div>
-          </div>
-
-          <div class="staking-grid">
-            <div class="staking-stat">
-              Available in wallet<br />
-              <strong id="staking-available">0</strong>
-              <span style="opacity:0.7;">$WINKY</span>
-            </div>
-            <div class="staking-stat">
-              Preview staked<br />
-              <strong id="staking-staked">0</strong>
-              <span style="opacity:0.7;">$WINKY</span>
-            </div>
-          </div>
-
-          <div class="staking-form-row">
-            <input
-              id="staking-amount"
-              class="staking-input"
-              type="text"
-              inputmode="decimal"
-              placeholder="Amount of $WINKY to stake (preview only)"
-            />
-            <div class="staking-actions">
-              <button type="button" class="btn btn-primary" id="staking-stake-btn">
-                Stake (preview)
-              </button>
-              <button type="button" class="btn btn-secondary" id="staking-unstake-btn">
-                Unstake (preview)
-              </button>
-            </div>
-          </div>
-
-          <p class="staking-note">
-            In the live version, staking will lock your $WINKY in a Solana program, while you keep
-            control over your wallet. For now this only simulates balances in the UI.
-          </p>
+      <div class="staking-card">
+        <div class="staking-header">
+          <div class="staking-title">$WINKY staking overview</div>
+          <div class="staking-tag">Coming soon · on-chain</div>
         </div>
-      </section>
+
+        <div class="staking-grid">
+          <div class="staking-stat">
+            Available in wallet<br />
+            <strong id="staking-available">0</strong>
+            <span style="opacity:0.7;">$WINKY</span>
+          </div>
+          <div class="staking-stat">
+            Preview staked<br />
+            <strong id="staking-staked">0</strong>
+            <span style="opacity:0.7;">$WINKY</span>
+          </div>
+        </div>
+
+        <div class="staking-form-row">
+          <input
+            id="staking-amount"
+            class="staking-input"
+            type="text"
+            inputmode="decimal"
+            placeholder="Amount of $WINKY to stake (preview only)"
+          />
+          <div class="staking-actions">
+            <button type="button" class="btn btn-primary" id="staking-stake-btn">
+              Stake (preview)
+            </button>
+            <button type="button" class="btn btn-secondary" id="staking-unstake-btn">
+              Unstake (preview)
+            </button>
+          </div>
+        </div>
+
+        <p class="staking-note">
+          In the live version, staking will lock your $WINKY in a Solana program, while you keep
+          control over your wallet. For now this only simulates balances in the UI.
+        </p>
+      </div>
     </section>
   </main>
 
@@ -576,7 +576,7 @@
     // PORTFOLIO LOADING
     // ==============================
 
-    // hier deine echte Worker-URL eintragen
+    // hier deine echte Worker-URL
     const PORTFOLIO_WORKER_URL = "https://plain-butterfly-27ba.christopher-milosch.workers.dev";
 
     function formatAmount(num) {
@@ -612,7 +612,7 @@
         const json = await res.json();
         console.log("Portfolio worker response:", json);
 
-        // Versuche mehrere mögliche Strukturen
+        // mögliche Strukturen prüfen
         let tokensArr = [];
 
         if (json.data && json.data.data && Array.isArray(json.data.data.tokens)) {
@@ -667,7 +667,7 @@
           };
         });
 
-        // sortiere nach Market Cap, dann nach Amount
+        // sort: highest market cap first, then amount
         mapped.sort((a, b) => {
           const amc = a.marketCap || 0;
           const bmc = b.marketCap || 0;
