@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Winky – Launch a Solana meme token</title>
+  <title>Winky – Launch a Meme Token</title>
 
   <style>
     :root {
@@ -31,7 +31,6 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* NAV */
     .nav {
       max-width: 980px;
       margin: 0 auto;
@@ -55,27 +54,22 @@
       color: var(--text-muted);
       font-weight: 500;
     }
-
     .nav-links a:hover { color: var(--accent); }
 
-    .nav-links a.active { color: var(--accent); }
-
     .nav-wallet {
-      margin-left: 20px;
-      padding: 8px 16px;
-      font-size: 14px;
+      margin-left: 18px;
+      padding: 8px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.02);
+      color: var(--text-main);
+      font-size: 13px;
       cursor: pointer;
-      transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
-    }
-    .nav-wallet:hover {
-      background: rgba(255,255,255,0.08);
-      transform: translateY(-1px);
+      white-space: nowrap;
     }
 
-    /* Winky Logo */
+    .nav-wallet:hover { background: rgba(255,255,255,0.06); }
+
     .winky-logo {
       --size: 28px;
       display: flex;
@@ -100,11 +94,10 @@
       97.5%        { transform: scaleY(1) scaleX(1); }
     }
 
-    /* PAGE LAYOUT */
     .page {
       max-width: 980px;
-      margin: 0 auto 60px;
-      padding: 32px 20px 60px;
+      margin: 0 auto 80px;
+      padding: 32px 20px 80px;
     }
 
     .section-label {
@@ -117,137 +110,102 @@
 
     .section-title {
       font-size: 28px;
-      margin: 0 0 10px;
+      margin: 0 0 8px;
     }
 
     .section-text {
-      margin: 0 0 20px;
+      margin: 0 0 24px;
       color: var(--text-muted);
       font-size: 15px;
       max-width: 640px;
     }
 
-    .launch-layout {
+    .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-      gap: 20px;
+      grid-template-columns: minmax(0,1.3fr) minmax(0,1fr);
+      gap: 22px;
       align-items: flex-start;
     }
 
-    @media (max-width: 900px) {
-      .launch-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card {
+    .launch-card,
+    .preview-card {
       background: radial-gradient(circle at top left,
         rgba(0,255,247,0.14), var(--card));
       border-radius: 18px;
-      padding: 18px 18px 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .tag {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-muted);
-    }
-
-    .badge {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      color: var(--accent);
-      background: rgba(0,255,247,0.06);
-      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 18px 18px 20px;
     }
 
     .launch-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px 16px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px 14px;
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
-    .launch-field {
+    .field {
       display: flex;
       flex-direction: column;
       gap: 4px;
       font-size: 13px;
     }
 
-    .launch-label {
-      color: var(--text-muted);
+    .field-label {
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.14em;
-      font-size: 10px;
+      color: var(--text-muted);
     }
 
-    .launch-input,
-    .launch-textarea,
-    .launch-select {
+    .input,
+    .textarea {
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(2,6,12,0.75);
+      background: rgba(0,0,0,0.4);
       color: var(--text-main);
       padding: 8px 10px;
       font-size: 13px;
       outline: none;
-      width: 100%;
     }
 
-    .launch-textarea {
+    .textarea {
       resize: vertical;
-      min-height: 72px;
+      min-height: 70px;
     }
 
-    .launch-input::placeholder,
-    .launch-textarea::placeholder {
-      color: rgba(163,171,184,0.7);
+    .input::placeholder,
+    .textarea::placeholder {
+      color: rgba(255,255,255,0.4);
     }
 
-    .launch-input:focus,
-    .launch-textarea:focus,
-    .launch-select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
+    .input:focus,
+    .textarea:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 10px var(--accent-soft);
     }
 
-    .launch-row {
+    .small-row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      align-items: center;
-      margin-top: 10px;
       font-size: 12px;
       color: var(--text-muted);
+      margin-top: 6px;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 9px 16px;
+      padding: 8px 14px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.45);
+      color: var(--text-main);
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      background: transparent;
-      color: var(--text-main);
       text-decoration: none;
       transition:
         background .15s ease,
@@ -257,193 +215,192 @@
       white-space: nowrap;
     }
 
-    .btn span { margin-left: 6px; }
-
     .btn-primary {
       background: var(--accent);
       border-color: transparent;
       color: #020303;
-      box-shadow: 0 0 18px var(--accent-strong);
+      box-shadow: 0 0 16px var(--accent-strong);
     }
-
     .btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 0 24px var(--accent-strong);
+      box-shadow: 0 0 22px var(--accent-strong);
     }
 
     .btn-secondary:hover {
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.08);
       transform: translateY(-1px);
     }
 
-    .btn-ghost {
-      background: rgba(0,0,0,0.3);
-    }
-
-    .btn-disabled {
-      opacity: 0.45;
+    .btn[disabled] {
+      opacity: 0.5;
       cursor: default;
-      pointer-events: none;
+      transform: none;
       box-shadow: none;
     }
 
-    .btn-small {
-      padding: 6px 10px;
-      font-size: 12px;
+    /* Logo / Image section */
+    .logo-section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.10);
     }
 
-    .help-text {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .radio-row {
+    .logo-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      margin: 6px 0 10px;
       font-size: 12px;
     }
 
-    .radio-row label {
+    .logo-options label {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
     }
 
-    /* Fee & creator-buy */
-    .fee-row {
+    .logo-ai-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .logo-ai-input {
+      flex: 1 1 180px;
+    }
+
+    .logo-gallery {
+      display: flex;
+      gap: 8px;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
 
-    .fee-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
+    .logo-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+      cursor: pointer;
+      position: relative;
     }
 
-    .fee-highlight {
-      color: var(--accent);
-      font-size: 13px;
-    }
-
-    input[type="range"] {
+    .logo-thumb img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    /* LOGO INPUTS */
-    .logo-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 10px;
+    .logo-thumb.active {
+      box-shadow: 0 0 0 2px var(--accent);
+      border-color: var(--accent);
     }
 
-    .preview-card {
-      background: radial-gradient(circle at top,
-        rgba(0,255,247,0.18), var(--card));
-      border-radius: 18px;
-      padding: 16px 16px 18px;
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 0 24px rgba(0,255,247,0.12);
-    }
-
-    .preview-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
+    .logo-thumb-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      font-size: 9px;
+      background: rgba(0,0,0,0.7);
+      padding: 1px 4px;
+      border-radius: 999px;
     }
 
     .preview-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
-      background: #05070b;
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: #111622;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 18px;
+      font-weight: 600;
+      font-size: 20px;
       color: var(--accent);
       overflow: hidden;
       flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.16);
     }
 
     .preview-logo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
-    }
-
-    .preview-logo.has-image img {
       display: block;
     }
 
-    .preview-logo.has-image span {
-      display: none;
+    .preview-header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .preview-name {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
     }
 
-    .preview-symbol {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .preview-story {
+    .preview-ticker {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 10px;
-      min-height: 36px;
     }
 
-    .preview-meta {
-      font-size: 11px;
+    .preview-desc {
+      font-size: 14px;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin: 4px 0 10px;
     }
 
-    .preview-buttons {
+    .preview-links {
+      font-size: 12px;
+      color: var(--text-muted);
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .preview-buttons .btn {
-      flex: 1 1 140px;
-      justify-content: center;
+    .preview-links a {
+      color: var(--accent);
+      text-decoration: none;
     }
 
-    .preview-note {
+    .preview-meta {
       margin-top: 10px;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-muted);
+    }
+
+    .preview-actions {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .footer {
       max-width: 980px;
       margin: 0 auto;
-      padding: 0 20px 28px;
+      padding: 0 20px 32px;
       font-size: 12px;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 6px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 720px) {
-      .nav { padding-top: 14px; }
       .nav-links { display: none; }
       .nav-wallet {
         padding: 6px 12px;
@@ -463,302 +420,193 @@
       </div>
       <span>Winky</span>
     </div>
-
     <nav class="nav-links">
       <a href="index.html">Home</a>
       <a href="dashboard.html">Dashboard</a>
-      <a href="index.html#token">$WINKY</a>
       <a href="tracker.html">Token tracker</a>
       <a href="portfolio.html">Stake</a>
-      <a href="index.html#how">How it works</a>
-      <a href="index.html#features">Features</a>
-      <a href="index.html#roadmap">Roadmap</a>
-      <a href="index.html#faq">FAQ</a>
     </nav>
-
-    <button id="wallet-button" class="nav-wallet">Connect wallet</button>
+    <button id="wallet-button" class="nav-wallet" type="button">
+      Connect wallet
+    </button>
   </header>
 
-  <!-- MAIN -->
   <main class="page">
-    <div class="section-label">Launcher</div>
-    <h1 class="section-title">Launch a Solana meme token</h1>
+    <div class="section-label">Launch</div>
+    <h1 class="section-title">Launch a meme token with Winky</h1>
     <p class="section-text">
-      The Winky launcher helps you spin up a fun meme token as fast as possible.
-      This is a <strong>pre-launch UI</strong>: it collects your idea, logo and links.
-      For now, you still finish the launch on <strong>Pump.fun</strong>.
-      Later, an on-chain “Launch with Winky” flow will be added.
+      Fill in your token basics, generate or upload a logo and preview how it will look.
+      Later, this flow can send a real PumpFun launch transaction from your connected wallet.
     </p>
 
-    <div class="launch-layout">
+    <div class="layout">
       <!-- LEFT: FORM -->
-      <section class="card">
-        <div class="card-header">
-          <div>
-            <div class="tag">Token setup</div>
-            <div style="font-size:13px; color:var(--text-muted);">
-              Fill out your meme idea. Winky uses this for previews and future bots.
-            </div>
-          </div>
-          <div class="badge">Pre-launch · UI only</div>
-        </div>
+      <section class="launch-card">
+        <h2 style="margin:0 0 8px;font-size:16px;">Token setup</h2>
 
         <div class="launch-grid">
-          <div class="launch-field">
-            <label class="launch-label" for="token-name">Token name</label>
-            <input id="token-name" class="launch-input"
-                   type="text" placeholder="Example: NanoBanana"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              Full name of your token. Fun, short and memeable.
-            </div>
+          <div class="field">
+            <label class="field-label" for="token-name">Token name</label>
+            <input id="token-name" class="input" type="text" placeholder="e.g. Winky The Watcher" />
           </div>
 
-          <div class="launch-field">
-            <label class="launch-label" for="token-symbol">Symbol / ticker</label>
-            <input id="token-symbol" class="launch-input"
-                   type="text" maxlength="8"
-                   placeholder="Example: $NANA"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              3–6 characters usually work best. Will be your on-chain ticker.
-            </div>
+          <div class="field">
+            <label class="field-label" for="token-ticker">Ticker</label>
+            <input id="token-ticker" class="input" type="text" placeholder="e.g. WINKY" maxlength="8" />
           </div>
 
-          <div class="launch-field">
-            <label class="launch-label" for="token-supply">Total supply</label>
-            <input id="token-supply" class="launch-input"
-                   type="text" placeholder="Example: 1 000 000 000"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              Planned total supply (exact number is set on Pump.fun when you launch).
-            </div>
+          <div class="field">
+            <label class="field-label" for="token-supply">Initial supply</label>
+            <input id="token-supply" class="input" type="text" placeholder="e.g. 1 000 000 000" />
           </div>
 
-          <div class="launch-field">
-            <label class="launch-label" for="token-website">Website (optional)</label>
-            <input id="token-website" class="launch-input"
-                   type="url"
-                   placeholder="https://yourtoken.xyz"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              If you already have a site, add it here for the preview card.
-            </div>
+          <div class="field">
+            <label class="field-label" for="token-website">Website (optional)</label>
+            <input id="token-website" class="input" type="text" placeholder="https://your-meme.com" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="token-twitter">X / Twitter handle</label>
+            <input id="token-twitter" class="input" type="text" placeholder="@yourmeme" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="token-discord">Discord (optional)</label>
+            <input id="token-discord" class="input" type="text" placeholder="https://discord.gg/..." />
           </div>
         </div>
 
-        <div class="launch-field">
-          <label class="launch-label" for="token-story">Idea &amp; story</label>
-          <textarea id="token-story" class="launch-textarea"
-            placeholder="Describe your meme, lore and why this token should exist…"
-            oninput="updatePreview()"></textarea>
-          <div class="help-text">
-            This text powers your Dex-style preview and can later be used as description.
+        <div class="field">
+          <label class="field-label" for="token-story">Idea &amp; story</label>
+          <textarea
+            id="token-story"
+            class="textarea"
+            placeholder="Explain the meme, the narrative and what makes this token fun."
+          ></textarea>
+        </div>
+
+        <!-- LOGO / IMAGE SECTION -->
+        <div class="logo-section">
+          <div class="field-label">Logo</div>
+          <div class="logo-options">
+            <label>
+              <input type="radio" name="logo-mode" value="upload" checked />
+              Upload image
+            </label>
+            <label>
+              <input type="radio" name="logo-mode" value="url" />
+              From image URL
+            </label>
+            <label>
+              <input type="radio" name="logo-mode" value="ai" />
+              Generate with NanoBanana
+            </label>
+          </div>
+
+          <!-- Upload -->
+          <div id="logo-upload-row" class="small-row">
+            <input
+              id="logo-file"
+              type="file"
+              accept="image/*"
+              style="font-size:12px;color:var(--text-muted);"
+            />
+            <span>Recommended: 512x512 px, square.</span>
+          </div>
+
+          <!-- URL -->
+          <div id="logo-url-row" class="small-row" style="display:none;">
+            <input
+              id="logo-url-input"
+              class="input"
+              type="text"
+              placeholder="https://example.com/your-logo.png"
+              style="flex:1 1 260px;"
+            />
+            <button class="btn btn-secondary" type="button" id="logo-url-apply">
+              Use URL
+            </button>
+          </div>
+
+          <!-- AI -->
+          <div id="logo-ai-row" style="display:none;">
+            <div class="logo-ai-row">
+              <input
+                id="logo-ai-prompt"
+                class="input logo-ai-input"
+                type="text"
+                placeholder="Cute AI-generated meme logo, simple, bold colors..."
+              />
+              <button class="btn btn-primary" type="button" id="logo-ai-generate">
+                Generate logo
+              </button>
+            </div>
+            <div class="small-row">
+              <span id="logo-ai-status">Model: NanoBanana / Google AI Studio (via Worker)</span>
+            </div>
+            <div class="logo-gallery" id="logo-gallery"></div>
           </div>
         </div>
 
-        <!-- ART PROMPT & LOGO -->
-        <div class="launch-grid" style="margin-top:14px;">
-          <div class="launch-field">
-            <label class="launch-label" for="art-prompt">Art prompt (logo / banner)</label>
-            <textarea id="art-prompt" class="launch-textarea"
-              placeholder="Example: hyper-cute 3D banana astronaut in a neon space suit, teal background"
-            ></textarea>
-            <div class="launch-row">
-              <span>Use this text in your favourite AI image generator.</span>
-              <button type="button" class="btn btn-small btn-ghost"
-                      onclick="copyArtPrompt()">Copy prompt</button>
-            </div>
-            <div class="help-text">
-              Works with Google AI Studio / NanoBanana, DALL·E, Midjourney, etc.
-              No APIs are called from this page – you stay in control.
-            </div>
-          </div>
-
-          <div class="launch-field">
-            <label class="launch-label">Logo options</label>
-            <div class="logo-grid">
-              <div>
-                <input id="logo-file" class="launch-input" type="file"
-                       accept="image/*"
-                       onchange="handleLogoFile(this.files)" />
-                <div class="help-text">
-                  Upload a square-ish logo (PNG/JPG). Used in the preview card.
-                </div>
-              </div>
-              <div>
-                <input id="logo-url" class="launch-input"
-                       type="url"
-                       placeholder="or paste image URL…"
-                       oninput="handleLogoUrl(this.value)" />
-                <div class="help-text">
-                  If your logo is already hosted somewhere, paste the direct image URL.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SOCIALS -->
-        <div class="launch-grid" style="margin-top:14px;">
-          <div class="launch-field">
-            <label class="launch-label" for="token-x">X / Twitter handle (optional)</label>
-            <input id="token-x" class="launch-input"
-                   type="text"
-                   placeholder="@youraccount"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              Can be a personal account or a community profile.
-            </div>
-          </div>
-          <div class="launch-field">
-            <label class="launch-label" for="token-telegram">Telegram / Discord (optional)</label>
-            <input id="token-telegram" class="launch-input"
-                   type="text"
-                   placeholder="t.me/yourgroup or discord.gg/xyz"
-                   oninput="updatePreview()" />
-            <div class="help-text">
-              Main chat for your meme community (if you already have one).
-            </div>
-          </div>
-        </div>
-
-        <!-- LAUNCH MODE & FEES -->
-        <div style="margin-top:18px;">
-          <div class="launch-field">
-            <span class="launch-label">Launch mode</span>
-            <div class="radio-row">
-              <label>
-                <input type="radio" name="launch-mode" value="pumpfun"
-                       checked onchange="updatePreview()" />
-                Launch via Pump.fun (live today)
-              </label>
-              <label>
-                <input type="radio" name="launch-mode" value="winky"
-                       onchange="updatePreview()" />
-                Launch with Winky (on-chain, coming soon)
-              </label>
-            </div>
-            <div class="help-text">
-              Today, the button just prepares your data and forwards you to Pump.fun.
-              The Winky on-chain launcher will be added later.
-            </div>
-          </div>
-
-          <div class="fee-row">
-            <div class="fee-header">
-              <span>Creator buy-in at launch (preview only)</span>
-              <span class="fee-highlight">
-                <span id="creator-buy-value">0</span>% of total supply
-              </span>
-            </div>
-            <input id="creator-buy-range"
-                   type="range"
-                   min="0" max="10" step="0.5"
-                   value="0"
-                   oninput="updateCreatorBuy()" />
-            <div class="help-text">
-              Planned amount you buy yourself at launch. Capped at
-              <strong>max. 10&nbsp;%</strong> of the total supply for fairness.
-              This setting is only documented in the preview for now.
-            </div>
-          </div>
-
-          <div class="fee-row">
-            <div class="fee-header">
-              <span>Trading fee (for future Winky launcher)</span>
-              <span class="fee-highlight" id="fee-display">
-                2% total · 1% creator · 1% prize pool
-              </span>
-            </div>
-            <input id="fee-range"
-                   type="range"
-                   min="0" max="10" step="0.5"
-                   value="2"
-                   oninput="updateFeeDisplay()" />
-            <div class="help-text">
-              Planned fee model for the Winky on-chain launcher.
-              Whatever you set here is split automatically:
-              50&nbsp;% to the meme creator, 50&nbsp;% to the Winky prize pool.
-            </div>
-          </div>
-        </div>
-
-        <!-- ACTION BUTTONS -->
-        <div class="launch-row" style="margin-top:16px;">
-          <button type="button" class="btn btn-primary"
-                  onclick="previewLaunchConfig()">
-            Prepare launch summary<span>→</span>
+        <div class="small-row" style="margin-top:14px;">
+          <button class="btn btn-secondary" type="button" id="preview-json">
+            Preview launch config (JSON)
           </button>
-
-          <button type="button" class="btn btn-secondary"
-                  onclick="openPumpFun()">
-            Open Pump.fun<span>→</span>
-          </button>
-
-          <button type="button" class="btn btn-secondary btn-disabled">
-            Launch with Winky (on-chain soon)
-          </button>
-        </div>
-        <div class="help-text" style="margin-top:6px;">
-          Today, these buttons <strong>do not create tokens</strong>.
-          They just help you structure your idea and jump to Pump.fun.
+          <span style="font-size:12px;color:var(--text-muted);">
+            Later this will create a real PumpFun launch transaction from your connected wallet.
+          </span>
         </div>
       </section>
 
-      <!-- RIGHT: LIVE PREVIEW -->
-      <aside class="preview-card">
-        <div class="tag" style="margin-bottom:6px;">Live preview</div>
+      <!-- RIGHT: PREVIEW -->
+      <section class="preview-card">
+        <h2 style="margin:0 0 10px;font-size:16px;">Live preview</h2>
+
         <div class="preview-header">
-          <div id="preview-logo" class="preview-logo">
-            <img id="preview-logo-img" alt="Token logo" />
-            <span id="preview-logo-text">?</span>
+          <div class="preview-logo" id="preview-logo">
+            <span id="preview-logo-fallback">?</span>
           </div>
           <div>
-            <div id="preview-name" class="preview-name">Your token name</div>
-            <div id="preview-symbol" class="preview-symbol">$TICKER</div>
+            <div class="preview-name" id="preview-name">Unnamed token</div>
+            <div class="preview-ticker" id="preview-ticker">$TICKER</div>
           </div>
         </div>
 
-        <div id="preview-story" class="preview-story">
-          Your meme story and description will appear here as you type.
-        </div>
-
-        <div id="preview-meta" class="preview-meta">
-          Supply: <span id="preview-supply">not set</span><br>
-          Website: <span id="preview-website">–</span><br>
-          X: <span id="preview-x">–</span><br>
-          Social: <span id="preview-telegram">–</span>
-        </div>
-
-        <div class="preview-buttons">
-          <button type="button" class="btn btn-primary btn-disabled">
-            View on Dexscreener
-          </button>
-          <button type="button" class="btn btn-secondary btn-disabled">
-            Buy on Pump.fun
-          </button>
-        </div>
-
-        <p class="preview-note">
-          This card is inspired by Dexscreener token panels. After launch you can re-create
-          a similar view on trackers and DEX UIs using your final contract address and links.
+        <p class="preview-desc" id="preview-desc">
+          This is where your meme story will appear. Describe your idea above to see it here.
         </p>
-      </aside>
+
+        <div class="preview-links" id="preview-links">
+          <!-- website / twitter / discord -->
+        </div>
+
+        <div class="preview-meta" id="preview-meta">
+          Supply: not set · Fees: standard PumpFun fees (no extra Winky fee in this mode)
+        </div>
+
+        <div class="preview-actions">
+          <button class="btn btn-primary" type="button" id="launch-pumpfun">
+            Launch on PumpFun (placeholder)
+          </button>
+          <a class="btn btn-secondary" id="download-logo" href="#" download="token-logo.png">
+            Download logo
+          </a>
+        </div>
+      </section>
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <span>© 2025 Winky · Experimental Solana meme tooling. DYOR.</span>
     <span>
-      <a href="index.html">Back to home</a> ·
+      <a href="index.html#top">Back to main page</a>
+      ·
       <a href="https://github.com/SvdowUser/winky-site" target="_blank" rel="noreferrer">GitHub</a>
     </span>
   </footer>
 
-  <!-- SCRIPTS -->
   <script>
+    // === Shared wallet button (simple Phantom connect) ===
     const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
 
     function shortAddress(addr) {
@@ -784,7 +632,7 @@
         localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
         btn.textContent = shortAddress(pubkey);
       } catch (err) {
-        console.error("Wallet connect error:", err);
+        console.error(err);
         const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
         btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
       } finally {
@@ -796,188 +644,307 @@
       const btn = document.getElementById("wallet-button");
       if (!btn) return;
       btn.addEventListener("click", connectWinkyWallet);
-
       const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
       btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
     }
 
-    // -------- PREVIEW LOGIC --------
+    // === Launcher state ===
+    const state = {
+      name: "",
+      ticker: "",
+      supply: "",
+      website: "",
+      twitter: "",
+      discord: "",
+      story: "",
+      logoUrl: null,       // aktuelles Logo für Preview
+      logoGallery: [],     // letzte AI-Generierungen
+    };
+
     function updatePreview() {
-      const name    = document.getElementById("token-name").value.trim();
-      const symbol  = document.getElementById("token-symbol").value.trim();
-      const story   = document.getElementById("token-story").value.trim();
-      const website = document.getElementById("token-website").value.trim();
-      const supply  = document.getElementById("token-supply").value.trim();
-      const x       = document.getElementById("token-x").value.trim();
-      const tg      = document.getElementById("token-telegram").value.trim();
-
       const nameEl   = document.getElementById("preview-name");
-      const symEl    = document.getElementById("preview-symbol");
-      const storyEl  = document.getElementById("preview-story");
-      const metaElS  = document.getElementById("preview-supply");
-      const metaElW  = document.getElementById("preview-website");
-      const metaElX  = document.getElementById("preview-x");
-      const metaElTg = document.getElementById("preview-telegram");
-      const logoText = document.getElementById("preview-logo-text");
+      const tickerEl = document.getElementById("preview-ticker");
+      const descEl   = document.getElementById("preview-desc");
+      const linksEl  = document.getElementById("preview-links");
+      const logoBox  = document.getElementById("preview-logo");
+      const logoFallback = document.getElementById("preview-logo-fallback");
 
-      nameEl.textContent  = name || "Your token name";
-      symEl.textContent   = symbol ? ("$" + symbol.toUpperCase()) : "$TICKER";
-      storyEl.textContent = story || "Your meme story and description will appear here as you type.";
+      const name   = state.name || "Unnamed token";
+      const ticker = state.ticker || "TICKER";
 
-      metaElS.textContent  = supply || "not set";
-      metaElW.textContent  = website || "–";
-      metaElX.textContent  = x || "–";
-      metaElTg.textContent = tg || "–";
+      nameEl.textContent = name;
+      tickerEl.textContent = "$" + ticker;
 
-      const logoFallback = (symbol || name || "?")
-        .replace(/[^a-z0-9]/gi, "")
-        .slice(0,3)
-        .toUpperCase() || "?";
-      logoText.textContent = logoFallback;
+      if (state.story && state.story.trim()) {
+        descEl.textContent = state.story.trim();
+      } else {
+        descEl.textContent =
+          "This is where your meme story will appear. Describe your idea above to see it here.";
+      }
+
+      // Links
+      let html = [];
+      if (state.website) {
+        html.push(
+          '<span>Website: <a href="' +
+          state.website +
+          '" target="_blank" rel="noreferrer">link</a></span>'
+        );
+      }
+      if (state.twitter) {
+        html.push(
+          '<span>X: <a href="https://x.com/' +
+          state.twitter.replace(/^@/, "") +
+          '" target="_blank" rel="noreferrer">@' +
+          state.twitter.replace(/^@/, "") + '</a></span>'
+        );
+      }
+      if (state.discord) {
+        html.push(
+          '<span>Discord: <a href="' +
+          state.discord +
+          '" target="_blank" rel="noreferrer">join</a></span>'
+        );
+      }
+      linksEl.innerHTML = html.join(" · ");
+
+      // Logo
+      const oldImg = logoBox.querySelector("img");
+      if (oldImg) {
+        oldImg.remove();
+      }
+
+      if (state.logoUrl) {
+        const img = document.createElement("img");
+        img.src = state.logoUrl;
+        logoBox.appendChild(img);
+        logoFallback.style.display = "none";
+      } else {
+        logoFallback.style.display = "block";
+        logoFallback.textContent = (ticker || "?")[0] || "?";
+      }
     }
 
-    function handleLogoFile(files) {
-      if (!files || !files.length) return;
-      const file = files[0];
-      if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file.");
-        return;
-      }
+    // === Logo mode handling ===
+    function setLogoMode(mode) {
+      document.getElementById("logo-upload-row").style.display =
+        mode === "upload" ? "flex" : "none";
+      document.getElementById("logo-url-row").style.display =
+        mode === "url" ? "flex" : "none";
+      document.getElementById("logo-ai-row").style.display =
+        mode === "ai" ? "block" : "none";
+    }
+
+    // === File upload -> logoUrl (Data URL) ===
+    function handleLogoFile(file) {
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        setPreviewLogoSrc(reader.result);
+        state.logoUrl = reader.result;
+        updatePreview();
+        // Download-Button aktualisieren
+        const dl = document.getElementById("download-logo");
+        dl.href = state.logoUrl;
       };
       reader.readAsDataURL(file);
     }
 
-    function handleLogoUrl(url) {
-      if (!url) {
-        clearPreviewLogoImage();
-        return;
-      }
-      setPreviewLogoSrc(url);
+    // === Logo per URL ===
+    function applyLogoUrlFromInput() {
+      const input = document.getElementById("logo-url-input");
+      if (!input.value) return;
+      state.logoUrl = input.value.trim();
+      updatePreview();
+      const dl = document.getElementById("download-logo");
+      dl.href = state.logoUrl;
     }
 
-    function setPreviewLogoSrc(src) {
-      const logo = document.getElementById("preview-logo");
-      const img  = document.getElementById("preview-logo-img");
-      if (!logo || !img) return;
-      img.src = src;
-      logo.classList.add("has-image");
-    }
+    // === NanoBanana AI call via Worker ===
+    const NANOBANANA_WORKER = "https://winky-nanobanana-worker.christopher-milosch.workers.dev"; // <- ANPASSEN
 
-    function clearPreviewLogoImage() {
-      const logo = document.getElementById("preview-logo");
-      const img  = document.getElementById("preview-logo-img");
-      if (!logo || !img) return;
-      img.src = "";
-      logo.classList.remove("has-image");
-    }
+    async function generateLogoWithAI() {
+      const promptEl = document.getElementById("logo-ai-prompt");
+      const statusEl = document.getElementById("logo-ai-status");
+      const gallery  = document.getElementById("logo-gallery");
+      const btn      = document.getElementById("logo-ai-generate");
+      const prompt   = (promptEl.value || "").trim();
 
-    function copyArtPrompt() {
-      const prompt = document.getElementById("art-prompt").value;
       if (!prompt) {
-        alert("Please enter a prompt first.");
+        alert("Please enter a short prompt for the logo.");
         return;
       }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(prompt).then(
-          () => alert("Prompt copied. Paste it into Google AI Studio / NanoBanana / DALL·E, etc."),
-          () => alert("Could not copy automatically. You can copy the text manually.")
-        );
-      } else {
-        alert("Clipboard API not available. Please copy the text manually.");
+
+      btn.disabled = true;
+      statusEl.textContent = "Generating via NanoBanana…";
+
+      try {
+        const res = await fetch(NANOBANANA_WORKER, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const json = await res.json();
+        console.log("NanoBanana worker response:", json);
+
+        if (!json.success || !json.imageUrl) {
+          statusEl.textContent = "Failed to generate image (check Worker / API).";
+          return;
+        }
+
+        const url = json.imageUrl;
+        state.logoUrl = url;
+        updatePreview();
+
+        const dl = document.getElementById("download-logo");
+        dl.href = url;
+
+        // in Galerie speichern
+        state.logoGallery.unshift(url);
+        state.logoGallery = state.logoGallery.slice(0, 6); // max 6 Bilder
+
+        gallery.innerHTML = "";
+        state.logoGallery.forEach((u, idx) => {
+          const div = document.createElement("div");
+          div.className = "logo-thumb" + (idx === 0 ? " active" : "");
+          const img = document.createElement("img");
+          img.src = u;
+          div.appendChild(img);
+
+          const badge = document.createElement("div");
+          badge.className = "logo-thumb-badge";
+          badge.textContent = idx === 0 ? "latest" : "#" + (idx + 1);
+          div.appendChild(badge);
+
+          div.addEventListener("click", () => {
+            state.logoUrl = u;
+            updatePreview();
+            dl.href = u;
+            gallery
+              .querySelectorAll(".logo-thumb")
+              .forEach(el => el.classList.remove("active"));
+            div.classList.add("active");
+          });
+
+          gallery.appendChild(div);
+        });
+
+        statusEl.textContent = "Generated successfully.";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error while calling NanoBanana Worker.";
+      } finally {
+        btn.disabled = false;
       }
     }
 
-    // Fee + creator-buy sliders
-    function updateFeeDisplay() {
-      const range = document.getElementById("fee-range");
-      const label = document.getElementById("fee-display");
-      if (!range || !label) return;
-
-      const total = parseFloat(range.value || "0");
-      const half  = (total / 2).toFixed(1).replace(".0", "");
-      const tot   = total.toFixed(1).replace(".0", "");
-      label.textContent =
-        tot + "% total · " +
-        half + "% creator · " +
-        half + "% prize pool";
-    }
-
-    function updateCreatorBuy() {
-      const range = document.getElementById("creator-buy-range");
-      const label = document.getElementById("creator-buy-value");
-      if (!range || !label) return;
-      label.textContent = range.value;
-    }
-
-    // Prepare summary (no real launch)
-    function previewLaunchConfig() {
-      const name    = document.getElementById("token-name").value.trim() || "Unnamed token";
-      const symbol  = document.getElementById("token-symbol").value.trim().toUpperCase() || "TICKER";
-      const story   = document.getElementById("token-story").value.trim() || "";
-      const website = document.getElementById("token-website").value.trim() || "";
-      const supply  = document.getElementById("token-supply").value.trim() || "";
-      const x       = document.getElementById("token-x").value.trim() || "";
-      const tg      = document.getElementById("token-telegram").value.trim() || "";
-      const art     = document.getElementById("art-prompt").value.trim() || "";
-
-      const modeInput = document.querySelector('input[name="launch-mode"]:checked');
-      const mode      = modeInput ? modeInput.value : "pumpfun";
-
-      const feeRange   = document.getElementById("fee-range");
-      const creatorBuy = document.getElementById("creator-buy-range");
-
-      const totalFee  = feeRange ? parseFloat(feeRange.value || "0") : 0;
-      const creatorBI = creatorBuy ? parseFloat(creatorBuy.value || "0") : 0;
-
+    // === JSON preview of launch config ===
+    function previewLaunchJson() {
       const wallet = localStorage.getItem(WINKY_WALLET_STORAGE_KEY) || null;
 
-      const summary = {
-        token: {
-          name,
-          symbol,
-          supply,
-          story,
-          website,
-          artPrompt: art
+      const feeTotal = 0; // für PumpFun-Modus derzeit keine extra Winky-Fee
+
+      const data = {
+        name: state.name || "Unnamed token",
+        symbol: (state.ticker || "TICKER").toUpperCase(),
+        supply: state.supply || null,
+        story: state.story || "",
+        links: {
+          website: state.website || null,
+          twitter: state.twitter || null,
+          discord: state.discord || null,
         },
-        socials: {
-          xOrTwitter: x,
-          telegramOrDiscord: tg
-        },
-        launch: {
-          mode,
-          creatorWallet: wallet,
-          creatorBuyPercentOfSupply: creatorBI,
-          tradeFeePercentTotal: totalFee,
-          feeSplit: {
-            creator: totalFee / 2,
-            prizePool: totalFee / 2
+        logoUrl: state.logoUrl || null,
+        creatorWallet: wallet,
+        network: "solana",
+        launchMode: "pumpfun",
+        feeModel: {
+          tradeFeePercentTotal: feeTotal,
+          split: {
+            creator: 0,
+            prizePool: 0
           }
         }
       };
 
       alert(
-        "Launch preview (no on-chain action):\n\n" +
-        JSON.stringify(summary, null, 2) +
-        "\n\nUse this as a reference when you set things up on Pump.fun."
+        "Launch preview (UI only – copy for PumpFun):\n\n" +
+        JSON.stringify(data, null, 2)
       );
     }
 
-    function openPumpFun() {
-      // Heute: einfach Pump.fun in neuem Tab öffnen.
-      // Wenn Pump.fun später URL-Parameter zum Vorbefüllen unterstützt,
-      // kannst du sie hier in die URL einbauen.
-      window.open("https://pump.fun/", "_blank");
+    // === "Launch on PumpFun" button (placeholder) ===
+    function handleLaunchPumpfun() {
+      alert(
+        "This is a placeholder.\n\n" +
+        "Next step: build a real PumpFun launch transaction using the values\n" +
+        "from this preview and your connected wallet."
+      );
+      // spätere Version: window.open("https://pump.fun/create", "_blank");
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    // === Init ===
+    document.addEventListener("DOMContentLoaded", () => {
       initWalletButton();
+
+      // Input binding
+      document.getElementById("token-name").addEventListener("input", e => {
+        state.name = e.target.value;
+        updatePreview();
+      });
+      document.getElementById("token-ticker").addEventListener("input", e => {
+        state.ticker = e.target.value.toUpperCase();
+        updatePreview();
+      });
+      document.getElementById("token-supply").addEventListener("input", e => {
+        state.supply = e.target.value;
+        updatePreview();
+      });
+      document.getElementById("token-website").addEventListener("input", e => {
+        state.website = e.target.value;
+        updatePreview();
+      });
+      document.getElementById("token-twitter").addEventListener("input", e => {
+        state.twitter = e.target.value;
+        updatePreview();
+      });
+      document.getElementById("token-discord").addEventListener("input", e => {
+        state.discord = e.target.value;
+        updatePreview();
+      });
+      document.getElementById("token-story").addEventListener("input", e => {
+        state.story = e.target.value;
+        updatePreview();
+      });
+
+      // Logo mode
+      document.querySelectorAll('input[name="logo-mode"]').forEach(radio => {
+        radio.addEventListener("change", e => {
+          setLogoMode(e.target.value);
+        });
+      });
+
+      // File upload
+      document.getElementById("logo-file").addEventListener("change", e => {
+        const file = e.target.files && e.target.files[0];
+        handleLogoFile(file);
+      });
+
+      // URL
+      document.getElementById("logo-url-apply").addEventListener("click", applyLogoUrlFromInput);
+
+      // AI
+      document.getElementById("logo-ai-generate").addEventListener("click", generateLogoWithAI);
+
+      // JSON preview
+      document.getElementById("preview-json").addEventListener("click", previewLaunchJson);
+
+      // Launch placeholder
+      document.getElementById("launch-pumpfun").addEventListener("click", handleLaunchPumpfun);
+
+      // Download-Button zuerst deaktivieren
+      const dl = document.getElementById("download-logo");
+      dl.href = "#";
       updatePreview();
-      updateFeeDisplay();
-      updateCreatorBuy();
     });
   </script>
 </body>
