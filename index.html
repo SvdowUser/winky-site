@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Winky – Solana Safety Bot</title>
+  <title>Winky – Solana Safety Bot & Token Tracker</title>
 
   <style>
     :root {
@@ -18,12 +18,8 @@
       --green: #7cff4d;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -32,14 +28,8 @@
       color: var(--text-main);
     }
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
     .nav {
       max-width: 980px;
@@ -59,19 +49,13 @@
       letter-spacing: 0.04em;
     }
 
-    .nav-eyes {
-      font-size: 22px;
-    }
-
     .nav-links a {
       margin-left: 18px;
       color: var(--text-muted);
       font-weight: 500;
     }
 
-    .nav-links a:hover {
-      color: var(--accent);
-    }
+    .nav-links a:hover { color: var(--accent); }
 
     .hero {
       max-width: 980px;
@@ -80,10 +64,8 @@
       text-align: center;
     }
 
-       .hero-eyes {
-      margin-bottom: 8px;
-    }
-    
+    .hero-eyes { margin-bottom: 8px; }
+
     .hero-title {
       font-size: clamp(38px, 5vw, 48px);
       margin: 6px 0 10px;
@@ -118,9 +100,14 @@
       font-weight: 500;
       cursor: pointer;
       text-decoration: none;
-      transition: background .15s ease, transform .15s ease,
-        box-shadow .15s ease, border-color .15s ease;
+      transition:
+        background .15s ease,
+        transform .15s ease,
+        box-shadow .15s ease,
+        border-color .15s ease;
     }
+
+    .btn span { margin-left: 6px; }
 
     .btn-primary {
       background: var(--accent);
@@ -139,19 +126,13 @@
       transform: translateY(-1px);
     }
 
-    .btn span {
-      margin-left: 6px;
-    }
-
     .page {
       max-width: 980px;
       margin: 0 auto 80px;
       padding: 0 20px 80px;
     }
 
-    section {
-      margin-top: 40px;
-    }
+    section { margin-top: 40px; }
 
     .section-label {
       text-transform: uppercase;
@@ -172,70 +153,6 @@
       font-size: 15px;
       max-width: 640px;
     }
-    /* --- FEES & POOLS FLOW DIAGRAM --- */
-.fees-flow {
-  margin-top: 18px;
-}
-
-.fees-flow-source {
-  background: radial-gradient(circle at top left,
-    rgba(0,255,247,0.16), var(--card));
-  border-radius: 18px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  font-size: 14px;
-}
-
-.fees-flow-source-amount {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.fees-flow-grid {
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px;
-}
-
-.fees-flow-box {
-  background: radial-gradient(circle at top left,
-    rgba(0,255,247,0.10), var(--card));
-  border-radius: 18px;
-  padding: 14px 16px 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  font-size: 14px;
-}
-
-.fees-flow-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.fees-flow-pill {
-  display: inline-block;
-  margin-bottom: 6px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.16);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--text-muted);
-}
-
-.fees-flow-list {
-  margin: 6px 0 0;
-  padding-left: 18px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.fees-flow-list li + li {
-  margin-top: 3px;
-}
-
 
     .cards {
       display: grid;
@@ -261,6 +178,7 @@
       color: var(--text-muted);
       font-size: 14px;
     }
+
     .coming .card {
       background: radial-gradient(circle at top,
         rgba(0,255,247,0.18), var(--card));
@@ -340,123 +258,7 @@
       grid-template-columns: minmax(0,1.1fr) minmax(0,1fr);
       gap: 16px;
     }
-/* === Launch setup (simple fee slider) === */
 
-.launch-card {
-  margin-top: 24px;
-  background: radial-gradient(circle at top left,
-    rgba(0,255,247,0.12), var(--card));
-  border-radius: 18px;
-  padding: 20px 20px 24px;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-.launch-top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.launch-tag {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--text-muted);
-}
-
-.launch-badge {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-soft);
-  color: var(--accent);
-  background: rgba(0,255,247,0.08);
-}
-
-.launch-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.launch-field-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.launch-input {
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.3);
-  color: var(--text-main);
-  font-size: 14px;
-}
-
-.launch-input::placeholder {
-  color: rgba(255,255,255,0.35);
-}
-
-.launch-fee-row {
-  margin-top: 18px;
-}
-
-.launch-fee-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  margin-bottom: 6px;
-}
-
-.launch-fee-label {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.launch-fee-value {
-  font-size: 13px;
-  color: var(--accent);
-}
-
-.launch-fee-range {
-  width: 100%;
-}
-
-.launch-fee-range input[type="range"] {
-  width: 100%;
-}
-
-.launch-fee-note {
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.launch-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.launch-helper-text {
-  font-size: 12px;
-  color: var(--text-muted);
-}
     .list {
       margin: 8px 0 0;
       padding-left: 18px;
@@ -464,9 +266,7 @@
       font-size: 14px;
     }
 
-    .list li + li {
-      margin-top: 4px;
-    }
+    .list li + li { margin-top: 4px; }
 
     .footer {
       max-width: 980px;
@@ -481,58 +281,41 @@
       border-top: 1px solid rgba(255,255,255,0.08);
     }
 
-    .footer a {
-      color: var(--text-muted);
-    }
+    .footer a { color: var(--text-muted); }
 
-      /* --- WINKY LOGO: zwei Pupillen, rechter Punkt zwinkert --- */
+    /* Winky logo */
     .winky-logo {
       --size: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: calc(var(--size) * 0.18);      /* Abstand zwischen den Augen */
+      gap: calc(var(--size) * 0.18);
     }
 
-    /* kleine Version in der Navbar */
-    .winky-logo--small {
-      --size: 28px;
-    }
+    .winky-logo--small { --size: 28px; }
+    .winky-logo--hero { --size: 80px; }
 
-    /* große Version im Hero */
-    .winky-logo--hero {
-      --size: 80px;
-    }
-
-    /* Pupillen – zwei runde Punkte */
     .winky-eye {
       width: calc(var(--size) * 0.38);
       height: calc(var(--size) * 0.38);
       border-radius: 50%;
-      background: var(--accent);          /* Farbe der Pupille */
+      background: var(--accent);
       box-shadow: 0 0 10px var(--accent-soft);
       transform-origin: center center;
     }
 
-.winky-eye.right {
-  /* 14s = noch seltenerer Blink */
-  animation: winky-blink 14s infinite ease-in-out;
-}
+    .winky-eye.right {
+      animation: winky-blink 14s infinite ease-in-out;
+    }
 
-/* Zwinker-Animation: sehr kurz, relativ weich */
-@keyframes winky-blink {
-  0%, 94%, 100% {
-    transform: scaleY(1) scaleX(1);
-  }
-  96% {
-    transform: scaleY(0.12) scaleX(1.3); /* fast komplett zu */
-  }
-  97.5% {
-    transform: scaleY(1) scaleX(1);      /* wieder offen */
-  }
-}
+    @keyframes winky-blink {
+      0%, 94%, 100% { transform: scaleY(1) scaleX(1); }
+      96% { transform: scaleY(0.12) scaleX(1.3); }
+      97.5% { transform: scaleY(1) scaleX(1); }
+    }
 
-        .faq-list {
+    /* FAQ */
+    .faq-list {
       margin-top: 20px;
       max-width: 720px;
       margin-left: auto;
@@ -551,9 +334,7 @@
         background .15s ease;
     }
 
-    .faq-list details:hover {
-      background: rgba(255,255,255,0.02);
-    }
+    .faq-list details:hover { background: rgba(255,255,255,0.02); }
 
     .faq-list summary {
       cursor: pointer;
@@ -568,19 +349,14 @@
       user-select: none;
     }
 
-    .faq-list summary::-webkit-details-marker {
-      display: none;
-    }
+    .faq-list summary::-webkit-details-marker { display: none; }
 
-    /* + / − Icon rechts */
     .faq-list summary::after {
       content: "+";
       font-weight: 600;
       color: var(--text-muted);
       flex-shrink: 0;
-      transition:
-        transform .15s ease,
-        color .15s ease;
+      transition: transform .15s ease, color .15s ease;
     }
 
     .faq-list details[open] summary::after {
@@ -599,10 +375,9 @@
       font-size: 14px;
       color: var(--text-muted);
     }
-    /* --- TOKEN HERO PANEL --- */
-    #token {
-      margin-top: 40px;
-    }
+
+    /* TOKEN HERO PANEL */
+    #winky-token { margin-top: 40px; }
 
     .token-panel {
       max-width: 780px;
@@ -700,7 +475,8 @@
       pointer-events: none;
       box-shadow: none;
     }
-    /* TOKENOMICS SECTION */
+
+    /* TOKENOMICS */
     .tokenomics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -731,10 +507,9 @@
       font-size: 13px;
       color: var(--text-muted);
     }
+
     /* COMMUNITY CTA */
-    .community-cta {
-      margin-top: 40px;
-    }
+    .community-cta { margin-top: 40px; }
 
     .community-cta .cta-buttons {
       display: flex;
@@ -781,140 +556,16 @@
       box-shadow: 0 0 26px var(--accent-strong);
     }
 
-    .cta-btn-outline {
-      background: transparent;
-    }
+    .cta-btn-outline { background: transparent; }
+    .cta-btn-outline:hover { background: rgba(255,255,255,0.04); }
 
-    .cta-btn-outline:hover {
-      background: rgba(255,255,255,0.04);
-    }
-
-    .cta-btn-alt {
-      border-color: #00c2ff;
-      color: #00c2ff;
-    }
-
-    .cta-btn-alt:hover {
-      background: rgba(0,194,255,0.12);
-    }
-    /* ---- LAUNCH PANEL ---- */
-    .launch-section {
-      margin-top: 40px;
-    }
-
-    .launch-card {
-      background: radial-gradient(circle at top left,
-        rgba(0,255,247,0.14), var(--card));
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 20px 20px 22px;
-      max-width: 720px;
-    }
-
-    .launch-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .launch-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .launch-badge {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      color: var(--accent);
-      background: rgba(0,255,247,0.05);
-      white-space: nowrap;
-    }
-
-    .launch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 14px 16px;
-      margin-bottom: 16px;
-    }
-
-    .launch-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 13px;
-    }
-
-    .launch-label {
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-size: 10px;
-    }
-
-    .launch-input,
-    .launch-select {
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(2,6,12,0.75);
-      color: var(--text-main);
-      padding: 8px 12px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .launch-input::placeholder {
-      color: rgba(163,171,184,0.7);
-    }
-
-    .launch-input:focus,
-    .launch-select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-    }
-
-    .launch-fees-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .launch-fee-input {
-      max-width: 90px;
-    }
-
-    .launch-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .launch-note {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .launch-note strong {
-      color: var(--accent);
-      font-weight: 600;
-    }
-    /* --- LAUNCH MODAL --- */
+    /* LAUNCH MODAL */
     .launch-modal-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.72);
       backdrop-filter: blur(6px);
-      display: none;             /* wird per JS auf flex gesetzt */
+      display: none;
       align-items: center;
       justify-content: center;
       z-index: 999;
@@ -998,24 +649,33 @@
       box-shadow: 0 0 10px var(--accent-soft);
     }
 
-    .lm-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .lm-fee {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .launch-fee-note {
+      margin-top: 6px;
       font-size: 12px;
       color: var(--text-muted);
     }
 
-    .lm-fee input {
-      max-width: 60px;
-      text-align: right;
+    .launch-fee-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
     }
+
+    .launch-fee-label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .launch-fee-value {
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    .launch-fee-range input[type="range"] { width: 100%; }
 
     .lm-wallet-status {
       font-size: 11px;
@@ -1042,77 +702,65 @@
       color: var(--text-muted);
     }
 
+    /* Wallet button in navbar */
+    .nav-wallet {
+      margin-left: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+
+    .nav-wallet:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+    }
+
     @media (max-width: 720px) {
-      .fees-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero {
-        padding-top: 34px;
-      }
-      .nav {
-        padding-top: 14px;
-      }
-      .nav-links {
-        display: none;
+      .fees-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 34px; }
+      .nav { padding-top: 14px; }
+      .nav-links { display: none; }
+      .nav-wallet {
+        padding: 6px 12px;
+        font-size: 12px;
       }
     }
-    /* Wallet Button in der Navbar */
-.nav-wallet {
-  margin-left: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.04);
-  cursor: pointer;
-  transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-
-.nav-wallet:hover {
-  background: rgba(255,255,255,0.08);
-  transform: translateY(-1px);
-}
-    @media (max-width: 720px) {
-  .nav-wallet {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-}
-
   </style>
 </head>
 
 <body>
-  <!-- Navigation -->
+  <!-- NAVIGATION -->
   <header class="nav">
     <div class="nav-brand">
-    <div class="winky-logo winky-logo--small">
-  <span class="winky-eye left"></span>
-  <span class="winky-eye right"></span>
-</div>
-
+      <div class="winky-logo winky-logo--small">
+        <span class="winky-eye left"></span>
+        <span class="winky-eye right"></span>
+      </div>
       <span>Winky</span>
     </div>
-<nav class="nav-links">
-  <a href="dashboard.html">Dashboard</a>
-    <a href="#token">Token</a>
-  <a href="tracker.html">Token tracker</a>
-      <a href="portfolio.html">Stake</a> <!-- NEU -->
-  <a href="#how">How it works</a>
-  <a href="#features">Features</a>
-  <a href="#roadmap">Roadmap</a>
-  <a href="#community">Community</a>
-  <a href="#faq">FAQ</a>
-</nav>
-<button id="wallet-button" class="btn btn-secondary nav-wallet">
-  Connect wallet
-</button>
 
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#winky-token">$WINKY</a>
+      <a href="tracker.html">Token tracker</a>
+      <a href="portfolio.html">Stake</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#community">Community</a>
+      <a href="#faq">FAQ</a>
+    </nav>
 
+    <button id="wallet-button" class="btn btn-secondary nav-wallet">
+      Connect wallet
+    </button>
   </header>
 
   <!-- HERO -->
-   <!-- HERO -->
   <main>
     <section class="hero">
       <div class="hero-eyes">
@@ -1127,105 +775,20 @@
         transparency and simple UX.
       </p>
 
-   <div class="hero-buttons">
-  <button class="btn btn-primary" type="button" onclick="openLaunchModal()">
-    Launch with Winky<span>→</span>
-  </button>
-  <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
-    Open chat<span>→</span>
-  </button>
-</div>
-
-
+      <div class="hero-buttons">
+        <button class="btn btn-primary" type="button" onclick="openLaunchModal()">
+          Launch with Winky<span>→</span>
+        </button>
+        <button class="btn btn-secondary" type="button" onclick="openWinkyFromHero()">
+          Open chat<span>→</span>
+        </button>
+      </div>
     </section>
 
-         <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
+    <!-- PAGE CONTENT -->
     <div class="page">
 
-          <!-- Ab hier alles in EINEM .page-Container, damit es gleich aussieht -->
-    <div class="page">
-
-           <!-- LAUNCH / TOKEN SETUP -->
-      <section id="token">
-        <div class="section-label">Launch</div>
-        <h2 class="section-title">Launch a meme token with Winky</h2>
-        <p class="section-text">
-          Connect your Solana wallet, describe your meme and choose a simple fee.
-          On-chain launching is still in development – this is the interface Winky will use.
-        </p>
-
-        <article class="launch-card">
-          <div class="launch-top-row">
-            <span class="launch-tag">Token setup</span>
-            <span class="launch-badge">Coming soon · on-chain</span>
-          </div>
-
-          <div class="launch-grid">
-            <div>
-              <div class="launch-field-label">Token name</div>
-              <input class="launch-input"
-                     type="text"
-                     placeholder="e.g. Winky The Watcher" />
-            </div>
-
-            <div>
-              <div class="launch-field-label">Ticker</div>
-              <input class="launch-input"
-                     type="text"
-                     placeholder="e.g. WINKY" />
-            </div>
-
-            <div>
-              <div class="launch-field-label">Initial supply</div>
-              <input class="launch-input"
-                     type="text"
-                     placeholder="e.g. 1 000 000 000" />
-            </div>
-          </div>
-
-          <div class="launch-fee-row">
-            <div class="launch-fee-header">
-              <span class="launch-fee-label">Launch fee per trade</span>
-              <span class="launch-fee-value" id="fee-display">
-                2% total · 1% creator · 1% prize pool
-              </span>
-            </div>
-            <div class="launch-fee-range">
-              <input
-                id="fee-range"
-                type="range"
-                min="0"
-                max="10"
-                step="0.5"
-                value="2"
-              />
-            </div>
-            <p class="launch-fee-note">
-              You can choose up to <strong>10% total fee</strong>.
-              Whatever you pick is split automatically:
-              <strong>50% to the meme creator</strong> and
-              <strong>50% to the Winky prize pool</strong>.
-            </p>
-          </div>
-
-          <div class="launch-actions">
-            <button class="btn btn-primary" type="button">
-              Preview launch config<span>→</span>
-            </button>
-            <span class="launch-helper-text">
-              Launch fee idea: ~2 USD per token launch. Final numbers and
-              contracts are still in development.
-            </span>
-          </div>
-        </article>
-      </section>
-
-
-      <!-- HOW IT WORKS -->
-      <section id="how">
-
-
-      <!-- COMING SOON -->
+      <!-- COMING SOON / WINKY LEARNS NEXT -->
       <section class="coming">
         <div class="section-label">Coming soon</div>
         <h2 class="section-title">What Winky will learn next</h2>
@@ -1246,7 +809,7 @@
           <article class="card">
             <h3>Telegram &amp; X bots</h3>
             <p>
-              Launch and track tokens directly from Telegram or X-bot commands, with Winky
+              Launch and track tokens directly from Telegram or X bot commands, with Winky
               handling the boring parts in the background.
             </p>
           </article>
@@ -1260,8 +823,9 @@
           </article>
         </div>
       </section>
-      <!-- TOKEN / MEME COIN PANEL -->
-      <section id="token">
+
+      <!-- WINKY TOKEN PANEL -->
+      <section id="winky-token">
         <div class="section-label">Winky token</div>
         <h2 class="section-title">$WINKY – coming soon</h2>
         <p class="section-text">
@@ -1270,7 +834,6 @@
         </p>
 
         <div class="token-panel">
-          <!-- Contract address -->
           <div>
             <span class="token-address-label">Contract address</span>
             <div class="token-address-box">
@@ -1279,7 +842,6 @@
             </div>
           </div>
 
-          <!-- Metrics (Platzhalter) -->
           <div class="token-metrics">
             <div>
               <span class="token-metric-label">Market cap</span>
@@ -1298,19 +860,12 @@
             </div>
           </div>
 
-          <!-- Buttons -->
           <div class="token-actions">
-            <!-- Buy-Button vorerst disabled -->
             <button class="btn btn-primary btn-wide btn-disabled" type="button">
               Buy $WINKY (soon)
             </button>
-
-            <!-- X & Community kannst du später verlinken -->
             <a class="btn btn-secondary btn-wide" href="https://x.com" target="_blank" rel="noreferrer">
               Follow on X
-            </a>
-            <a class="btn btn-secondary btn-wide" href="#" target="_blank" rel="noreferrer">
-              Join community
             </a>
           </div>
         </div>
@@ -1318,12 +873,8 @@
 
       <!-- HOW IT WORKS -->
       <section id="how">
-        ...
-
-      <!-- HOW IT WORKS -->
-      <section id="how">
         <div class="section-label">How Winky works</div>
-        <h2 class="section-title">From idea to safe meme launch in 3 steps</h2>
+        <h2 class="section-title">From idea to safer meme launch in 3 steps</h2>
         <p class="section-text">
           Winky guides you through the full flow: from naming your token, to generating branding,
           to launching in a way that protects buyers as much as possible.
@@ -1333,42 +884,44 @@
           <article class="card">
             <h3>1. Connect &amp; describe</h3>
             <p>
-              Connect your wallet and tell Winky what you want to launch: name, ticker, supply and
-              basic vibe of your meme.
+              Connect your wallet and tell Winky what you want to launch:
+              name, ticker, supply and basic vibe of your meme.
             </p>
           </article>
           <article class="card">
-            <h3>2. Safe launch template</h3>
+            <h3>2. Safer launch template</h3>
             <p>
-              Winky prepares a safe launch configuration: anti-rug mechanics, fair launch timing and
-              no hidden functions in the contract.
+              Winky prepares a launch configuration: anti-rug mechanics, fair
+              timing and no obvious backdoors in the setup.
             </p>
           </article>
           <article class="card">
             <h3>3. Branding &amp; sharing</h3>
             <p>
-              Winky generates a description, logo and banner ideas so you can instantly share your
-              token on X, Telegram and more.
+              Winky generates a description, logo and banner prompts so you can
+              instantly share your token on X, Telegram and more.
             </p>
           </article>
         </div>
       </section>
 
-      <!-- FEATURES -->
+      <!-- FEATURES / TOOLKIT -->
       <section id="features">
         <div class="section-label">Toolkit</div>
         <h2 class="section-title">What Winky can do for you</h2>
         <p class="section-text">
-          At launch, Winky is a simple chat interface. Over time, it evolves into a full Solana
-          meme toolkit – available on web, Telegram and later CEX integrations.
+          At launch, Winky is a simple chat interface plus a token tracker site.
+          Over time, it evolves into a full Solana meme toolkit – available on web,
+          Telegram and later CEX integrations.
         </p>
 
         <div class="cards">
           <article class="card">
-            <h3>Safe token launch</h3>
+            <h3>Safe token launch (preview)</h3>
             <p>
-              Step-by-step guidance to launch meme tokens without obvious rug mechanics or sniping
-              traps.
+              Step-by-step guidance to set up meme launches without obvious rug mechanics
+              or nasty sniping traps. For now this is a front-end preview – on-chain
+              contracts come later.
             </p>
             <div class="pill-row">
               <div class="pill good">Anti-rug focus</div>
@@ -1377,34 +930,23 @@
           </article>
 
           <article class="card">
-            <h3>Token scanner</h3>
+            <h3>Token tracker</h3>
             <p>
-              Paste a token address and let Winky highlight red flags in liquidity, mint authority,
-              ownership and more.
+              A simple tracker for Solana tokens: enter a token address and see price,
+              volume and basic health hints. Built around one clear view instead of
+              ten different tabs.
             </p>
             <div class="pill-row">
               <div class="pill warn">Risk hints</div>
-              <div class="pill">Quick checks</div>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Trend radar</h3>
-            <p>
-              Get a high-level view on what kind of Solana memes are trending, so you can position
-              your own launch better.
-            </p>
-            <div class="pill-row">
-              <div class="pill">Narratives</div>
-              <div class="pill">Community focus</div>
+              <div class="pill">Price &amp; volume</div>
             </div>
           </article>
 
           <article class="card">
             <h3>Branding generator</h3>
             <p>
-              Let Winky propose names, taglines, logo ideas and banner prompts so your coin looks
-              ready from day one.
+              Let Winky propose names, taglines, logo ideas and banner prompts so your
+              coin looks ready from day one.
             </p>
             <div class="pill-row">
               <div class="pill">Logos</div>
@@ -1429,8 +971,8 @@
             <div class="roadmap-phase">Phase 1 · MVP</div>
             <div class="roadmap-title">Landing page &amp; AI chat assistant</div>
             <p class="roadmap-text">
-              Basic website, Winky chatbot embedded, simple launch &amp; scan guidance for Solana meme
-              tokens.
+              Basic website, Winky chatbot embedded, simple launch &amp; scan guidance
+              for Solana meme tokens.
             </p>
           </div>
 
@@ -1439,8 +981,8 @@
             <div class="roadmap-phase">Phase 2 · Launch tools</div>
             <div class="roadmap-title">Guided launch &amp; branding generator</div>
             <p class="roadmap-text">
-              Interactive flows for safe token launches, automatic branding suggestions and export
-              for X / Telegram.
+              Interactive flows for safer token launches, automatic branding suggestions
+              and export for X / Telegram.
             </p>
           </div>
 
@@ -1459,34 +1001,33 @@
             <div class="roadmap-phase">Phase 4 · CEX integrations</div>
             <div class="roadmap-title">Tier-3/2 CEX listings &amp; growth budget</div>
             <p class="roadmap-text">
-              Treasury funds are used to target lower-tier CEX listings first (Bitget-style), then
-              scale towards higher tiers – always communicated transparently to the community.
+              Treasury funds are used to target lower-tier CEX listings first (Bitget-style),
+              then scale towards higher tiers – always communicated transparently to the community.
             </p>
           </div>
         </div>
       </section>
 
-      <!-- FEES / TOKENOMICS TEASER -->
+      <!-- FEES / USAGE -->
       <section id="fees">
         <div class="section-label">Fees &amp; usage</div>
         <h2 class="section-title">How Winky fees are intended to be used</h2>
-    <p class="section-text">
-  $WINKY is planned as a <strong>100% community-owned meme token</strong>.
-  There is no team bag, no presale and no VC allocation. The team does not earn
-  from holding a supply of tokens – only from small launch fees when people use
-  Winky to create their own PumpFun tokens.
-</p>
+        <p class="section-text">
+          $WINKY is planned as a <strong>100% community-owned meme token</strong>.
+          There is no team bag, no presale and no VC allocation. The team does not earn
+          from holding a supply of tokens – only from small launch fees when people use
+          Winky to create their own PumpFun tokens.
+        </p>
 
         <div class="fees-grid">
-<article class="card">
-  <h3>Launch fees (planned)</h3>
-  <ul class="list">
-    <li>~2 USD equivalent per token launch via Winky (on top of the normal PumpFun flow).</li>
-    <li>No built-in team tax on trades. If volume fees are added later, they are optional and clearly shown.</li>
-    <li>Winky never holds your tokens – launches are executed by PumpFun contracts, you sign in your own wallet.</li>
-  </ul>
-</article>
-
+          <article class="card">
+            <h3>Launch fees (planned)</h3>
+            <ul class="list">
+              <li>~2 USD equivalent per token launch via Winky (on top of the normal PumpFun flow).</li>
+              <li>No built-in team tax on trades. If volume fees are added later, they are optional and clearly shown.</li>
+              <li>Winky never holds your tokens – launches are executed by PumpFun contracts, you sign in your own wallet.</li>
+            </ul>
+          </article>
 
           <article class="card">
             <h3>What the fees are used for</h3>
@@ -1498,102 +1039,46 @@
           </article>
         </div>
       </section>
-              </section> <!-- Ende FEES -->
-
-      <!-- FEES & POOLS FLOW (NEU EINBAUEN) -->
-      <section id="fees-pools">
-        ...
-      </section>
-
-      <section id="tokenomics">  <!-- EXISTIERT BEREITS -->
-        <div class="section-label">Tokenomics (draft)</div>
 
       <!-- TOKENOMICS (DRAFT) -->
       <section id="tokenomics">
         <div class="section-label">Tokenomics (draft)</div>
-        <h2 class="section-title">$WINKY supply & usage</h2>
+        <h2 class="section-title">$WINKY supply &amp; usage</h2>
         <p class="section-text">
           Exact numbers can still change. The basic idea: fair supply, no crazy team locks
           and a treasury that actually gets used for listings, safety tools and memes.
         </p>
 
         <div class="tokenomics-grid">
-<article class="tokenomics-card">
-  <h3>Launch model</h3>
-  <div class="tokenomics-main">100% community owned</div>
-  <p class="tokenomics-note">
-    $WINKY will launch as a fair-launch on <strong>PumpFun</strong>.
-    All tokens are minted directly by the PumpFun contract – there is no
-    presale, no private team round and no VC allocation.
-  </p>
-</article>
-
-
-<article class="tokenomics-card">
-  <h3>Total supply</h3>
-  <div class="tokenomics-main">Defined by PumpFun</div>
-  <p class="tokenomics-note">
-    The exact total supply is whatever <strong>PumpFun</strong> mints when the
-    pool is created. Winky does not change this number and cannot mint extra
-    tokens – no hidden mint function, no extra supply later.
-  </p>
-</article>
-
-
           <article class="tokenomics-card">
-            <h3>Treasury & ecosystem</h3>
-            <div class="tokenomics-main">~25%</div>
+            <h3>Launch model</h3>
+            <div class="tokenomics-main">100% community owned</div>
             <p class="tokenomics-note">
-              Used for Winky development, marketing, leaderboard rewards and CEX listing
-              fees (starting with Tier-3/2).
+              $WINKY will launch as a fair-launch on <strong>PumpFun</strong>.
+              All tokens are minted directly by the PumpFun contract – there is no
+              presale, no private team round and no VC allocation.
             </p>
           </article>
 
-<article class="tokenomics-card">
-  <h3>Total supply</h3>
-  <div class="tokenomics-main">Defined by PumpFun</div>
-  <p class="tokenomics-note">
-    The exact total supply is whatever <strong>PumpFun</strong> mints when the
-    pool is created. Winky does not change this number and cannot mint extra
-    tokens – no hidden mint function, no extra supply later.
-  </p>
-</article>
+          <article class="tokenomics-card">
+            <h3>Total supply</h3>
+            <div class="tokenomics-main">Defined by PumpFun</div>
+            <p class="tokenomics-note">
+              The exact total supply is whatever <strong>PumpFun</strong> mints when the
+              pool is created. Winky does not change this number and cannot mint extra
+              tokens – no hidden mint function, no extra supply later.
+            </p>
+          </article>
 
           <article class="tokenomics-card">
-<h3>Treasury & ecosystem</h3>
-<div class="tokenomics-main">Fee-based funding only</div>
-<p class="tokenomics-note">
-  Winky does not receive any part of the $WINKY token supply.
-  All ecosystem funding comes from small launch fees (~2 USD per token)
-  and optional future fees for advanced tools. No token allocation.
-</p>
-
-</article>
-
-        </div>
-      </section>
-      <!-- COMMUNITY CTA -->
-      <section id="community" class="community-cta">
-        <div class="section-label">Join early</div>
-        <h2 class="section-title">Be part of the Winky experiment</h2>
-        <p class="section-text">
-          $WINKY is planned as the meme layer around the safety bot. Token contract and launch
-          details will be announced once the basics are tested and live.
-        </p>
-
-        <div class="cta-buttons">
-          <button class="cta-btn cta-btn-primary" type="button" disabled>
-            BUY $WINKY
-            <span> · coming soon</span>
-          </button>
-
-          <a class="cta-btn cta-btn-outline" href="#" target="_blank" rel="noreferrer">
-            Follow on X
-          </a>
-
-          <a class="cta-btn cta-btn-alt" href="#" target="_blank" rel="noreferrer">
-            Join community
-          </a>
+            <h3>Treasury &amp; ecosystem</h3>
+            <div class="tokenomics-main">Fee-based funding only</div>
+            <p class="tokenomics-note">
+              Winky does not receive any part of the $WINKY token supply.
+              All ecosystem funding comes from small launch fees (~2 USD per token)
+              and optional future fees for advanced tools. No token allocation.
+            </p>
+          </article>
         </div>
       </section>
 
@@ -1656,121 +1141,140 @@
         </div>
       </section>
 
+      <!-- COMMUNITY CTA – JOIN EARLY (jetzt UNTER FAQ) -->
+      <section id="community" class="community-cta">
+        <div class="section-label">Join early</div>
+        <h2 class="section-title">Be part of the Winky experiment</h2>
+        <p class="section-text">
+          $WINKY is planned as the meme layer around the safety bot. Token contract and launch
+          details will be announced once the basics are tested and live.
+        </p>
+
+        <div class="cta-buttons">
+          <button class="cta-btn cta-btn-primary" type="button" disabled>
+            BUY $WINKY
+            <span> · coming soon</span>
+          </button>
+
+          <a class="cta-btn cta-btn-outline" href="https://x.com" target="_blank" rel="noreferrer">
+            Follow on X
+          </a>
+        </div>
+      </section>
+
     </div> <!-- /page -->
-          <!-- LAUNCH MODAL -->
-  <div id="launch-modal" class="launch-modal-backdrop">
-    <div class="launch-modal">
-      <button class="launch-modal-close" type="button" onclick="closeLaunchModal()">×</button>
 
-      <div class="section-label">Quick launch</div>
-      <h2 class="launch-modal-title">Set up your meme token</h2>
-      <p class="launch-modal-sub">
-        This is a preview of the launch flow Winky will support. No real tokens are created yet.
-      </p>
+    <!-- LAUNCH MODAL -->
+    <div id="launch-modal" class="launch-modal-backdrop">
+      <div class="launch-modal">
+        <button class="launch-modal-close" type="button" onclick="closeLaunchModal()">×</button>
 
-      <form class="launch-modal-form" onsubmit="handleLaunchModalSubmit(event)">
-        <div class="lm-field">
-          <span class="lm-label">Token name</span>
-          <input
-            id="lm-name"
-            class="lm-input"
-            type="text"
-            placeholder="Winky The Watcher"
-            required
-          />
-        </div>
+        <div class="section-label">Quick launch</div>
+        <h2 class="launch-modal-title">Set up your meme token</h2>
+        <p class="launch-modal-sub">
+          This is a preview of the launch flow Winky will support. No real tokens are created yet.
+        </p>
 
-        <div class="lm-field">
-          <span class="lm-label">Ticker</span>
-          <input
-            id="lm-ticker"
-            class="lm-input"
-            type="text"
-            placeholder="WINKY"
-            maxlength="8"
-            required
-          />
-        </div>
-
-        <div class="lm-field">
-          <span class="lm-label">Total supply</span>
-          <input
-            id="lm-supply"
-            class="lm-input"
-            type="text"
-            placeholder="1 000 000 000"
-            required
-          />
-        </div>
-
-        <div class="lm-field">
-          <span class="lm-label">Vibe / emoji (optional)</span>
-          <input
-            id="lm-emoji"
-            class="lm-input"
-            type="text"
-            placeholder="👀✨"
-          />
-        </div>
-
-        <div class="lm-field">
-          <span class="lm-label">Short description</span>
-          <textarea
-            id="lm-desc"
-            class="lm-textarea"
-            rows="3"
-            placeholder="The AI watcher that helps you launch safer Solana memes."
-          ></textarea>
-        </div>
-
-               <!-- Einfacher Fee-Slider im Quick-Launch -->
-        <div class="lm-field">
-          <span class="lm-label">Launch fee per trade</span>
-
-          <div class="launch-fee-header">
-            <span class="launch-fee-label">Total fee</span>
-            <span class="launch-fee-value" id="quick-fee-display">
-              2% total · 1% creator · 1% prize pool
-            </span>
-          </div>
-
-          <div class="launch-fee-range">
+        <form class="launch-modal-form" onsubmit="handleLaunchModalSubmit(event)">
+          <div class="lm-field">
+            <span class="lm-label">Token name</span>
             <input
-              id="quick-fee-range"
-              type="range"
-              min="0"
-              max="10"
-              step="0.5"
-              value="2"
+              id="lm-name"
+              class="lm-input"
+              type="text"
+              placeholder="Winky The Watcher"
+              required
             />
           </div>
 
-          <p class="launch-fee-note">
-            You can choose up to <strong>10% total fee</strong>.
-            Whatever you pick is split automatically:
-            <strong>50% to you as creator</strong> and
-            <strong>50% to the Winky prize pool</strong>.
-          </p>
-        </div>
+          <div class="lm-field">
+            <span class="lm-label">Ticker</span>
+            <input
+              id="lm-ticker"
+              class="lm-input"
+              type="text"
+              placeholder="WINKY"
+              maxlength="8"
+              required
+            />
+          </div>
 
-        <div id="lm-wallet-status" class="lm-wallet-status">
-          Wallet: <span>not connected</span>
-        </div>
+          <div class="lm-field">
+            <span class="lm-label">Total supply</span>
+            <input
+              id="lm-supply"
+              class="lm-input"
+              type="text"
+              placeholder="1 000 000 000"
+              required
+            />
+          </div>
 
-        <div class="launch-modal-actions">
-          <button class="btn btn-primary" type="submit">
-            Preview launch config<span>→</span>
-          </button>
-          <p class="launch-modal-note">
-            Idea: ~2 USD fee per launch, split between creator & Winky treasury.
-          </p>
-        </div>
-      </form>
+          <div class="lm-field">
+            <span class="lm-label">Vibe / emoji (optional)</span>
+            <input
+              id="lm-emoji"
+              class="lm-input"
+              type="text"
+              placeholder="👀✨"
+            />
+          </div>
+
+          <div class="lm-field">
+            <span class="lm-label">Short description</span>
+            <textarea
+              id="lm-desc"
+              class="lm-textarea"
+              rows="3"
+              placeholder="The AI watcher that helps you launch safer Solana memes."
+            ></textarea>
+          </div>
+
+          <div class="lm-field">
+            <span class="lm-label">Launch fee per trade</span>
+
+            <div class="launch-fee-header">
+              <span class="launch-fee-label">Total fee</span>
+              <span class="launch-fee-value" id="quick-fee-display">
+                2% total · 1% creator · 1% prize pool
+              </span>
+            </div>
+
+            <div class="launch-fee-range">
+              <input
+                id="quick-fee-range"
+                type="range"
+                min="0"
+                max="10"
+                step="0.5"
+                value="2"
+              />
+            </div>
+
+            <p class="launch-fee-note">
+              You can choose up to <strong>10% total fee</strong>.
+              Whatever you pick is split automatically:
+              <strong>50% to you as creator</strong> and
+              <strong>50% to the Winky prize pool</strong>.
+            </p>
+          </div>
+
+          <div id="lm-wallet-status" class="lm-wallet-status">
+            Wallet: <span>not connected</span>
+          </div>
+
+          <div class="launch-modal-actions">
+            <button class="btn btn-primary" type="submit">
+              Preview launch config<span>→</span>
+            </button>
+            <p class="launch-modal-note">
+              Idea: ~2 USD fee per launch, split between creator &amp; Winky treasury.
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-
   </main>
-
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -1782,7 +1286,7 @@
     </span>
   </footer>
 
-  <!-- Optional: Funktion für Hero-Button, der Chat öffnet -->
+  <!-- Chat open helper -->
   <script>
     function openWinkyFromHero() {
       try {
@@ -1794,214 +1298,176 @@
       }
     }
   </script>
-  
 
-    <script>
-    function previewLaunchConfig() {
-      const name = document.getElementById('launch-name').value || 'Unnamed token';
-      const ticker = document.getElementById('launch-ticker').value || '???';
-      const supply = document.getElementById('launch-supply').value || 'not set';
-      const type = document.getElementById('launch-type').value;
-      const creator = document.getElementById('fee-creator').value || '0';
-      const treasury = document.getElementById('fee-treasury').value || '0';
-
-      alert(
-        'Launch preview:\\n\\n' +
-        'Name: ' + name + '\\n' +
-        'Ticker: ' + ticker + '\\n' +
-        'Supply: ' + supply + '\\n' +
-        'Type: ' + type + '\\n' +
-        'Fee split: ' + creator + '% creator / ' + treasury + '% treasury\\n\\n' +
-        '(On-chain launch coming soon – this is just a UI preview.)'
-      );
-    }
+  <!-- Chatbase embed -->
+  <script>
+    (function(){
+      if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+        window.chatbase = (...arguments) => {
+          if (!window.chatbase.q) { window.chatbase.q = []; }
+          window.chatbase.q.push(arguments);
+        };
+        window.chatbase = new Proxy(window.chatbase, {
+          get(target, prop) {
+            if (prop === "q") return target.q;
+            return (...args) => target(prop, ...args);
+          }
+        });
+      }
+      const onLoad = function () {
+        const script = document.createElement("script");
+        script.src = "https://www.chatbase.co/embed.min.js";
+        script.id = "xgDFFqw1jXeZaCSgZgIju";
+        script.domain = "www.chatbase.co";
+        document.body.appendChild(script);
+      };
+      if (document.readyState === "complete") { onLoad(); }
+      else { window.addEventListener("load", onLoad); }
+    })();
   </script>
-<script>
 
+  <!-- Wallet connect shared logic -->
+  <script>
+    const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
 
- 
-
-<script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="xgDFFqw1jXeZaCSgZgIju";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
-
-<script>
-  const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
-
-  function shortAddress(addr) {
-    if (!addr || addr.length < 8) return addr || "";
-    return addr.slice(0, 4) + "…" + addr.slice(-4);
-  }
-
-  async function connectWinkyWallet() {
-    const btn = document.getElementById("wallet-button");
-
-    if (!window.solana || !window.solana.isPhantom) {
-      alert("Please install the Phantom wallet extension (Phantom).");
-      window.open("https://phantom.app/", "_blank");
-      return;
+    function shortAddress(addr) {
+      if (!addr || addr.length < 8) return addr || "";
+      return addr.slice(0, 4) + "…" + addr.slice(-4);
     }
 
-    try {
-      btn.disabled = true;
-      btn.textContent = "Connecting…";
+    async function connectWinkyWallet() {
+      const btn = document.getElementById("wallet-button");
 
-      const resp = await window.solana.connect();
-      const pubkey = resp.publicKey.toString();
+      if (!window.solana || !window.solana.isPhantom) {
+        alert("Please install the Phantom wallet extension (Phantom).");
+        window.open("https://phantom.app/", "_blank");
+        return;
+      }
 
-      // Wichtig: gleicher Key wie auf der Portfolio-Seite
-      localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+      try {
+        btn.disabled = true;
+        btn.textContent = "Connecting…";
 
-      btn.textContent = shortAddress(pubkey);
-    } catch (err) {
-      console.error("Wallet connect error:", err);
-      const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
-      btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
-    } finally {
-      btn.disabled = false;
-    }
-  }
+        const resp = await window.solana.connect();
+        const pubkey = resp.publicKey.toString();
 
-  function initWinkyWalletButton() {
-    const btn = document.getElementById("wallet-button");
-    if (!btn) return;
-
-    btn.addEventListener("click", connectWinkyWallet);
-
-    const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
-    btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
-  }
-
-  document.addEventListener("DOMContentLoaded", initWinkyWalletButton);
-</script>
-
-        
-        <script>
-  // === Launch-Modal öffnen / schließen =======================
-  function openLaunchModal() {
-    const modal        = document.getElementById('launch-modal');
-   const walletStatus = document.getElementById('lm-wallet-status');
-
-    if (modal) {
-      modal.style.display = 'flex';
-    }
-
-    if (walletStatus && walletBtn) {
-      const span = walletStatus.querySelector('span');
-     const addr = localStorage.getItem("winkyWalletAddress");
-
-      if (addr && span) {
-        const short = addr.slice(0, 4) + '...' + addr.slice(-4);
-        span.textContent = short;
-        span.style.color = '#00fff7';      // var(--accent)
-      } else if (span) {
-        span.textContent = 'not connected';
-        span.style.color = '#a3abb8';      // var(--text-muted)
+        localStorage.setItem(WINKY_WALLET_STORAGE_KEY, pubkey);
+        btn.textContent = shortAddress(pubkey);
+      } catch (err) {
+        console.error("Wallet connect error:", err);
+        const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+        btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
+      } finally {
+        btn.disabled = false;
       }
     }
-  }
 
-  function closeLaunchModal() {
-    const modal = document.getElementById('launch-modal');
-    if (modal) {
-      modal.style.display = 'none';
+    function initWinkyWalletButton() {
+      const btn = document.getElementById("wallet-button");
+      if (!btn) return;
+
+      btn.addEventListener("click", connectWinkyWallet);
+
+      const saved = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
+      btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
     }
-  }
 
-  // === Submit im Launch-Modal (nur Vorschau) =================
-  function handleLaunchModalSubmit(event) {
-    event.preventDefault();
+    document.addEventListener("DOMContentLoaded", initWinkyWalletButton);
+  </script>
 
-    const name   = document.getElementById('lm-name').value.trim() || 'Unnamed token';
-    const ticker = (document.getElementById('lm-ticker').value || '').trim().toUpperCase();
-    const supply = document.getElementById('lm-supply').value.trim() || 'not set';
-    const emoji  = document.getElementById('lm-emoji').value.trim();
-    const desc   = document.getElementById('lm-desc').value.trim();
+  <!-- Launch modal logic -->
+  <script>
+    function openLaunchModal() {
+      const modal = document.getElementById('launch-modal');
+      const walletStatus = document.getElementById('lm-wallet-status');
 
-    // Slider im Modal (kannst du im HTML noch ergänzen, IDs: quick-fee-range & quick-fee-display)
-    const quickFeeRange = document.getElementById('quick-fee-range');
-    const totalFee = quickFeeRange ? parseFloat(quickFeeRange.value || '0') : 0;
-    const halfFee  = totalFee / 2;
+      if (modal) {
+        modal.style.display = 'flex';
+      }
 
-  const creatorAddress = localStorage.getItem("winkyWalletAddress") || null;
-
-
-    const data = {
-      name,
-      symbol: ticker,
-      supply,
-      emoji,
-      description: desc,
-      creator: creatorAddress,
-      network: 'solana',
-      mintType: 'meme-token',
-      feeModel: {
-        tradeFeePercentTotal: totalFee,
-        split: {
-          creator: halfFee,
-          prizePool: halfFee
+      if (walletStatus) {
+        const span = walletStatus.querySelector('span');
+        const addr = localStorage.getItem("winkyWalletAddress");
+        if (addr && span) {
+          const short = addr.slice(0, 4) + '...' + addr.slice(-4);
+          span.textContent = short;
+          span.style.color = '#00fff7';
+        } else if (span) {
+          span.textContent = 'not connected';
+          span.style.color = '#a3abb8';
         }
-      },
-      createdAt: new Date().toISOString()
-    };
-
-    alert(
-      'Launch preview (UI only):\n\n' +
-      JSON.stringify(data, null, 2)
-    );
-
-    closeLaunchModal();
-  }
-
-  // === Slider auf der Hauptseite (Launch fee per trade) ======
-  function updateFeeDisplay() {
-    const range = document.getElementById('fee-range');
-    const label = document.getElementById('fee-display');
-    if (!range || !label) return;
-
-    const total       = parseFloat(range.value || '0');
-    const half        = (total / 2).toFixed(1).replace('.0', '');
-    const totalPretty = total.toFixed(1).replace('.0', '');
-
-    label.textContent =
-      totalPretty + '% total · ' +
-      half + '% creator · ' +
-      half + '% prize pool';
-  }
-
-  // === Slider im Modal (Quick launch) ========================
-  function updateQuickFeeDisplay() {
-    const range = document.getElementById('quick-fee-range');
-    const label = document.getElementById('quick-fee-display');
-    if (!range || !label) return;
-
-    const total       = parseFloat(range.value || '0');
-    const half        = (total / 2).toFixed(1).replace('.0', '');
-    const totalPretty = total.toFixed(1).replace('.0', '');
-
-    label.textContent =
-      totalPretty + '% total · ' +
-      half + '% creator · ' +
-      half + '% prize pool';
-  }
-
-  // === Initialisieren, sobald DOM geladen ist ===============
-  document.addEventListener('DOMContentLoaded', function () {
-    const mainRange = document.getElementById('fee-range');
-    if (mainRange) {
-      mainRange.addEventListener('input', updateFeeDisplay);
-      updateFeeDisplay();
+      }
     }
 
-    const quickRange = document.getElementById('quick-fee-range');
-    if (quickRange) {
-      quickRange.addEventListener('input', updateQuickFeeDisplay);
-      updateQuickFeeDisplay();
+    function closeLaunchModal() {
+      const modal = document.getElementById('launch-modal');
+      if (modal) modal.style.display = 'none';
     }
-  });
-</script>
 
+    function handleLaunchModalSubmit(event) {
+      event.preventDefault();
 
+      const name   = document.getElementById('lm-name').value.trim() || 'Unnamed token';
+      const ticker = (document.getElementById('lm-ticker').value || '').trim().toUpperCase();
+      const supply = document.getElementById('lm-supply').value.trim() || 'not set';
+      const emoji  = document.getElementById('lm-emoji').value.trim();
+      const desc   = document.getElementById('lm-desc').value.trim();
 
+      const quickFeeRange = document.getElementById('quick-fee-range');
+      const totalFee = quickFeeRange ? parseFloat(quickFeeRange.value || '0') : 0;
+      const halfFee  = totalFee / 2;
+
+      const creatorAddress = localStorage.getItem("winkyWalletAddress") || null;
+
+      const data = {
+        name,
+        symbol: ticker,
+        supply,
+        emoji,
+        description: desc,
+        creator: creatorAddress,
+        network: 'solana',
+        mintType: 'meme-token',
+        feeModel: {
+          tradeFeePercentTotal: totalFee,
+          split: {
+            creator: halfFee,
+            prizePool: halfFee
+          }
+        },
+        createdAt: new Date().toISOString()
+      };
+
+      alert(
+        'Launch preview (UI only):\n\n' +
+        JSON.stringify(data, null, 2)
+      );
+
+      closeLaunchModal();
+    }
+
+    function updateQuickFeeDisplay() {
+      const range = document.getElementById('quick-fee-range');
+      const label = document.getElementById('quick-fee-display');
+      if (!range || !label) return;
+
+      const total       = parseFloat(range.value || '0');
+      const half        = (total / 2).toFixed(1).replace('.0', '');
+      const totalPretty = total.toFixed(1).replace('.0', '');
+
+      label.textContent =
+        totalPretty + '% total · ' +
+        half + '% creator · ' +
+        half + '% prize pool';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const quickRange = document.getElementById('quick-fee-range');
+      if (quickRange) {
+        quickRange.addEventListener('input', updateQuickFeeDisplay);
+        updateQuickFeeDisplay();
+      }
+    });
+  </script>
 </body>
 </html>
