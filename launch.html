@@ -140,7 +140,7 @@
 
     .launch-card {
       background: radial-gradient(circle at top left,
-      rgba(0,255,247,0.14), var(--card));
+        rgba(0,255,247,0.14), var(--card));
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.12);
       padding: 18px 18px 20px;
@@ -232,7 +232,7 @@
 
     .fee-slider-row {
       margin-top: 8px;
-      display: none; /* wird per JS eingeblendet, wenn Winky fee gewählt */
+      display: none;
       flex-direction: column;
       gap: 6px;
     }
@@ -321,7 +321,7 @@
     /* PREVIEW PANEL */
     .preview-card {
       background: radial-gradient(circle at top right,
-      rgba(0,255,247,0.18), var(--card));
+        rgba(0,255,247,0.18), var(--card));
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.12);
       padding: 16px 16px 18px;
@@ -378,6 +378,13 @@
     .preview-meta {
       font-size: 11px;
       color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .preview-links {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
     .preview-json {
@@ -497,22 +504,55 @@
           </div>
 
           <div class="launch-field">
-            <label class="launch-label" for="lf-emoji">Emoji / vibe (optional)</label>
+            <label class="launch-label" for="lf-logo">Upload logo (optional)</label>
             <input
-              id="lf-emoji"
+              id="lf-logo"
               class="launch-input"
-              type="text"
-              placeholder="🍌✨"
+              type="file"
+              accept="image/*"
+            />
+            <small class="helper-text">
+              If you upload an image, it will be used in the preview instead of the generated logo.
+            </small>
+          </div>
+
+          <div class="launch-field">
+            <label class="launch-label" for="lf-website">Website (optional)</label>
+            <input
+              id="lf-website"
+              class="launch-input"
+              type="url"
+              placeholder="https://yourtoken.xyz"
             />
           </div>
 
           <div class="launch-field">
-            <label class="launch-label" for="lf-x">X / Twitter handle (optional)</label>
+            <label class="launch-label" for="lf-x">X / Twitter (optional)</label>
             <input
               id="lf-x"
               class="launch-input"
               type="text"
-              placeholder="@youraccount"
+              placeholder="@youraccount or community"
+            />
+          </div>
+
+          <div class="launch-field">
+            <label class="launch-label" for="lf-discord">Discord (optional)</label>
+            <input
+              id="lf-discord"
+              class="launch-input"
+              type="text"
+              placeholder="Invite link or server name"
+            />
+          </div>
+
+          <div class="launch-field">
+            <label class="launch-label" for="lf-telegram">Telegram (optional)</label>
+            <input
+              id="lf-telegram"
+              class="launch-input"
+              type="text"
+              placeholder="Channel or group link"
             />
           </div>
         </div>
@@ -530,8 +570,8 @@
               />
               <span>
                 <strong>No extra Winky fee (Pump.fun only)</strong><br/>
-                You pay only the normal Pump.fun launch / trading fees. No additional
-                Winky trading tax is added.
+                You pay only the normal Pump.fun launch / trading fees.
+                No additional Winky trading tax is added.
               </span>
             </label>
 
@@ -564,7 +604,7 @@
               max="10"
               step="0.5"
               value="2"
-              oninput="updateFeeDisplay()"
+              oninput="updateFeeDisplay(); updatePreviewFromInputs();"
             />
             <p class="fee-note">
               You can choose up to <strong>10% total</strong>. Whatever you pick is split
@@ -589,9 +629,8 @@
         </div>
 
         <p class="helper-text">
-          Later, Winky bots on Telegram &amp; X will be able to use the same data:
-          <code>launch &lt;name&gt; &lt;ticker&gt; &lt;vibe&gt;</code> → token idea + art prompt +
-          fee config.
+          After you launch on Pump.fun, your token can be bought directly there.
+          Later, Winky bots on Telegram &amp; X will use the same data structure to launch for you.
         </p>
       </form>
     </section>
@@ -614,8 +653,15 @@
         Fill out the form to see how your meme will look on listing sites and bots.
       </p>
 
-      <div class="preview-meta" id="preview-meta">
+      <div id="preview-meta" class="preview-meta">
         No Winky trading fee selected (Pump.fun only).
+      </div>
+
+      <div id="preview-links" class="preview-links">
+        Website: –<br/>
+        X / Twitter: –<br/>
+        Discord: –<br/>
+        Telegram: –
       </div>
 
       <div id="preview-json" class="preview-json">
@@ -646,6 +692,7 @@
 <!-- JS: Wallet, Preview, Fees -->
 <script>
   const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
+  let uploadedLogoImg = null; // global für hochgeladenes Logo
 
   function shortAddress(addr) {
     if (!addr || addr.length < 8) return addr || "";
@@ -688,35 +735,72 @@
     btn.textContent = saved ? shortAddress(saved) : "Connect wallet";
   }
 
-  /* --- Logo Preview (Canvas) ------------------------------------- */
-  function drawLogoPreview(name, emoji) {
+  /* --- Logo Preview (Canvas + optional Upload) -------------------- */
+  function drawLogoPreview(name) {
     const canvas = document.getElementById("logo-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-
     const w = canvas.width;
     const h = canvas.height;
+
     ctx.clearRect(0, 0, w, h);
 
     // Hintergrund-Kreis
-    const grad = ctx.createLinearGradient(0,0,w,h);
-    grad.addColorStop(0, "#00fff7");
-    grad.addColorStop(1, "#0066ff");
-    ctx.fillStyle = grad;
+    ctx.save();
     ctx.beginPath();
-    ctx.arc(w/2, h/2, w/2 - 8, 0, Math.PI*2);
-    ctx.fill();
+    ctx.arc(w/2, h/2, w/2 - 8, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
 
-    // Buchstabe oder Emoji
-    ctx.fillStyle = "#020303";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    if (uploadedLogoImg) {
+      // Hochgeladenes Logo in den Kreis zeichnen
+      const img = uploadedLogoImg;
+      const ratio = Math.max(w / img.width, h / img.height);
+      const nw = img.width * ratio;
+      const nh = img.height * ratio;
+      const nx = (w - nw) / 2;
+      const ny = (h - nh) / 2;
+      ctx.drawImage(img, nx, ny, nw, nh);
+    } else {
+      // generierter Verlauf
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#00fff7");
+      grad.addColorStop(1, "#0066ff");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-    const label = (emoji && emoji.trim()) ||
-      (name ? name.trim().charAt(0).toUpperCase() : "?");
+      // Buchstabe
+      ctx.fillStyle = "#020303";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const label = (name ? name.trim().charAt(0).toUpperCase() : "?");
+      ctx.font = "bold 80px system-ui";
+      ctx.fillText(label, w/2, h/2);
+    }
 
-    ctx.font = label.length > 2 ? "bold 56px system-ui" : "bold 80px system-ui";
-    ctx.fillText(label, w/2, h/2);
+    ctx.restore();
+  }
+
+  function handleLogoUploadChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) {
+      uploadedLogoImg = null;
+      const name = document.getElementById("lf-name").value.trim() || "Winky";
+      drawLogoPreview(name);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        uploadedLogoImg = img;
+        const name = document.getElementById("lf-name").value.trim() || "Winky";
+        drawLogoPreview(name);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   /* --- Fee UI ----------------------------------------------------- */
@@ -765,24 +849,53 @@
     window.open("https://pump.fun", "_blank");
   }
 
-  /* --- Form Submit (Preview) ------------------------------------- */
+  /* --- Live Preview aus den Inputs ------------------------------- */
+  function updatePreviewFromInputs() {
+    const name     = document.getElementById("lf-name").value.trim();
+    const ticker   = document.getElementById("lf-ticker").value.trim().toUpperCase();
+    const story    = document.getElementById("lf-story").value.trim();
+    const website  = document.getElementById("lf-website").value.trim();
+    const xHandle  = document.getElementById("lf-x").value.trim();
+    const discord  = document.getElementById("lf-discord").value.trim();
+    const telegram = document.getElementById("lf-telegram").value.trim();
+
+    document.getElementById("preview-name").textContent =
+      name || "Your token name";
+    document.getElementById("preview-ticker").textContent =
+      ticker ? "$" + ticker : "$TICKER";
+
+    document.getElementById("preview-desc").textContent =
+      story || "Your token description will show up here.";
+
+    const linksEl = document.getElementById("preview-links");
+    linksEl.innerHTML =
+      "Website: " + (website || "–") + "<br/>" +
+      "X / Twitter: " + (xHandle || "–") + "<br/>" +
+      "Discord: " + (discord || "–") + "<br/>" +
+      "Telegram: " + (telegram || "–");
+
+    drawLogoPreview(name || "Winky");
+  }
+
+  /* --- Form Submit (JSON Preview) -------------------------------- */
   function handlePrepareLaunch(e) {
     e.preventDefault();
 
-    const name   = document.getElementById("lf-name").value.trim();
-    const ticker = document.getElementById("lf-ticker").value.trim().toUpperCase();
-    const story  = document.getElementById("lf-story").value.trim();
-    const art    = document.getElementById("lf-art").value.trim();
-    const emoji  = document.getElementById("lf-emoji").value.trim();
-    const handle = document.getElementById("lf-x").value.trim();
+    const name     = document.getElementById("lf-name").value.trim();
+    const ticker   = document.getElementById("lf-ticker").value.trim().toUpperCase();
+    const story    = document.getElementById("lf-story").value.trim();
+    const art      = document.getElementById("lf-art").value.trim();
+    const website  = document.getElementById("lf-website").value.trim();
+    const xHandle  = document.getElementById("lf-x").value.trim();
+    const discord  = document.getElementById("lf-discord").value.trim();
+    const telegram = document.getElementById("lf-telegram").value.trim();
 
-    const feeMode = getFeeMode();
+    const feeMode  = getFeeMode();
     const feeRange = document.getElementById("fee-range");
     const feeTotal = feeMode === "winky"
       ? parseFloat(feeRange.value || "0")
       : 0;
-
-    const feeHalf = feeTotal / 2;
+    const feeHalf  = feeTotal / 2;
 
     const creatorAddress = localStorage.getItem(WINKY_WALLET_STORAGE_KEY) || null;
 
@@ -790,9 +903,13 @@
       tokenName: name,
       ticker,
       story,
-      artPromptLogo: art,
-      emoji,
-      xHandle: handle,
+      artPromptLogo: art || null,
+      website: website || null,
+      socials: {
+        x: xHandle || null,
+        discord: discord || null,
+        telegram: telegram || null
+      },
       creatorWallet: creatorAddress,
       network: "solana",
       launchPath: feeMode === "pumpfun" ? "pumpfun" : "winky",
@@ -803,19 +920,11 @@
           prizePoolPercent: feeHalf
         } : null
       },
+      assets: {
+        logo: uploadedLogoImg ? "uploaded" : "generated-from-name"
+      },
       createdAt: new Date().toISOString()
     };
-
-    // Preview Text
-    document.getElementById("preview-name").textContent = name || "Your token name";
-    document.getElementById("preview-ticker").textContent = ticker
-      ? "$" + ticker
-      : "$TICKER";
-
-    document.getElementById("preview-desc").textContent =
-      story || "Your token description will show up here.";
-
-    drawLogoPreview(name, emoji);
 
     const pre = document.getElementById("preview-json");
     pre.textContent = JSON.stringify(launchData, null, 2);
@@ -825,7 +934,28 @@
   document.addEventListener("DOMContentLoaded", function () {
     initWalletButton();
     updateFeeUI();
-    drawLogoPreview("Winky", "👀");
+    drawLogoPreview("Winky");
+
+    // Live-Preview-Events
+    [
+      "lf-name",
+      "lf-ticker",
+      "lf-story",
+      "lf-website",
+      "lf-x",
+      "lf-discord",
+      "lf-telegram"
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", updatePreviewFromInputs);
+    });
+
+    const logoInput = document.getElementById("lf-logo");
+    if (logoInput) {
+      logoInput.addEventListener("change", handleLogoUploadChange);
+    }
+
+    updatePreviewFromInputs();
   });
 </script>
 
