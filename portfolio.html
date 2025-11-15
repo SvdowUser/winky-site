@@ -547,7 +547,6 @@
       btn.addEventListener("click", async () => {
         const stored = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
         if (stored) {
-          // später evtl. kleines Menü (disconnect etc.)
           return;
         }
         const connected = await connectWallet();
@@ -558,7 +557,6 @@
         }
       });
 
-      // initial state: check localStorage and Phantom
       let addr = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
       if (!addr && window.solana && window.solana.isConnected && window.solana.publicKey) {
         addr = window.solana.publicKey.toString();
@@ -595,7 +593,6 @@
       try {
         const url = `${PORTFOLIO_WORKER_URL}?wallet=${encodeURIComponent(walletAddress)}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Worker HTTP " + res.status);
         const json = await res.json();
         console.log("Portfolio worker response:", json);
 
@@ -626,8 +623,7 @@
             winkyBalance = amount;
           }
 
-          const shortMint =
-            mint.slice(0, 4) + "…" + mint.slice(-4);
+          const shortMint = mint.slice(0,4) + "…" + mint.slice(-4);
 
           return `
             <tr>
@@ -655,9 +651,10 @@
         }
       } catch (err) {
         console.error("Portfolio load failed:", err);
+        const msg = err && err.message ? err.message : "Unknown error";
         tbody.innerHTML =
-          '<tr class="table-message-row"><td colspan="2">Failed to load portfolio. ' +
-          (err && err.message ? err.message : "") +
+          '<tr class="table-message-row"><td colspan="2">Failed to load portfolio: ' +
+          msg +
           "</td></tr>";
       }
     }
