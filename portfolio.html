@@ -192,7 +192,7 @@
       word-break: break-all;
     }
 
-    /* TABLE (Portfolio) */
+    /* TABLE (Portfolio – nur UI) */
     .table-wrapper {
       margin-top: 8px;
       border-radius: 18px;
@@ -231,6 +231,21 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .token-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: #111622;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      overflow: hidden;
+      flex-shrink: 0;
     }
 
     .token-name {
@@ -384,8 +399,8 @@
       <div class="section-label">Portfolio</div>
       <h1 class="section-title">Your Solana wallet</h1>
       <p class="section-text">
-        Connect your wallet to see a simple overview of your SPL tokens.
-        Balances come live from your SPL token accounts in real time.
+        Connect your wallet to see your address and try the staking preview UI.
+        Full token balances will be added later once a long-term RPC setup is decided.
       </p>
 
       <div class="wallet-card" id="wallet-card">
@@ -394,31 +409,36 @@
           No wallet connected – connect on the top right first.
         </div>
         <div style="margin-top:6px; font-size:12px; color:var(--text-muted);">
-          This portfolio view is <strong>read-only</strong>. We only read public
-          on-chain data – never your private keys.
+          This view is <strong>read-only</strong>. We never ask for your seed phrase
+          – only the public wallet address.
         </div>
       </div>
 
-      <!-- TABLE -->
+      <!-- TABLE – nur UI / Coming soon -->
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Token mint</th>
+              <th>Token</th>
               <th>Amount</th>
             </tr>
           </thead>
           <tbody id="portfolio-rows">
             <tr class="table-message-row">
-              <td colspan="2">Connect your wallet to load your portfolio…</td>
+              <td colspan="2">
+                Portfolio tracking is planned but not live yet.
+                Once a stable free RPC option is available, your SPL tokens
+                will show up here automatically.
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p class="table-footer-note">
-        Balances are read directly from your SPL token accounts.
-        Values are approximate – always double-check in your wallet before you trade.
+        In future versions, balances will be read directly from your SPL token accounts.
+        Values shown here will always be approximate – please double-check in your wallet
+        before you trade.
       </p>
 
       <!-- STAKING -->
@@ -426,19 +446,19 @@
         <div class="section-label">Staking preview</div>
         <h2 class="section-title">Stake your $WINKY</h2>
         <p class="section-text">
-          Holders will later be able to stake $WINKY and earn a share of the holder reward pool.
-          This is a UI preview – no real transactions are sent yet.
+          Later, holders will be able to stake $WINKY and earn a share of the holder
+          reward pool. This is only a front-end preview – no real transactions are sent.
         </p>
 
         <div class="staking-card">
           <div class="staking-header">
             <div class="staking-title">$WINKY staking overview</div>
-            <div class="staking-tag">Coming soon · on-chain</div>
+            <div class="staking-tag">UI only · coming soon</div>
           </div>
 
           <div class="staking-grid">
             <div class="staking-stat">
-              Available in wallet<br />
+              Available (preview)<br />
               <strong id="staking-available">0</strong>
               <span style="opacity:0.7;">$WINKY</span>
             </div>
@@ -468,8 +488,8 @@
           </div>
 
           <p class="staking-note">
-            In the live version, staking will lock your $WINKY in a Solana program, while you keep
-            control over your wallet. For now this only simulates balances in the UI.
+            In the live version, staking will lock your $WINKY in a Solana program while
+            you keep control over your wallet. For now this only simulates balances in the UI.
           </p>
         </div>
       </section>
@@ -478,36 +498,30 @@
 
   <script>
     // ==============================
-    // BASIC CONFIG
+    // SHARED WALLET LOGIC
     // ==============================
+
     const WINKY_WALLET_STORAGE_KEY = "winkyWalletAddress";
-
-    // Deine zukünftige WINKY-Mint:
-    const WINKY_MINT = ""; // später ausfüllen
-
-    // Hier DEINE Worker-URL:
-    const PORTFOLIO_WORKER_URL =
-      "https://portfolio-rpc-workerjs.christopher-milosch.workers.dev";
-
-    // ==============================
-    // WALLET BUTTON (Phantom)
-    // ==============================
 
     function shortAddress(addr) {
       if (!addr || addr.length < 8) return addr || "";
-      return addr.slice(0, 4) + "…" + addr.slice(-4);
+      return addr.slice(0,4) + "…" + addr.slice(-4);
     }
 
     function updateWalletUi(address) {
       const btn = document.getElementById("wallet-button");
+      const addrEl = document.getElementById("wallet-address");
       if (!btn) return;
 
       if (address) {
         btn.classList.remove("disconnected");
         btn.textContent = shortAddress(address);
+        if (addrEl) addrEl.textContent = address;
       } else {
         btn.classList.add("disconnected");
         btn.textContent = "Connect wallet";
+        if (addrEl)
+          addrEl.textContent = "No wallet connected – connect on the top right first.";
       }
     }
 
@@ -515,7 +529,7 @@
       const provider = window.solana;
       if (!provider || !provider.isPhantom) {
         alert("Please install the Phantom wallet extension to connect.");
-        return null;
+        return;
       }
 
       try {
@@ -537,139 +551,23 @@
       btn.addEventListener("click", async () => {
         const stored = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
         if (stored) {
+          // später evtl. kleines Menü (disconnect etc.)
           return;
         }
-        const connected = await connectWallet();
-        if (connected) {
-          loadPortfolioIfReady(connected);
-          const addrEl = document.getElementById("wallet-address");
-          if (addrEl) addrEl.textContent = connected;
-        }
+        await connectWallet();
       });
 
+      // initial state: check localStorage and Phantom
       let addr = localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
       if (!addr && window.solana && window.solana.isConnected && window.solana.publicKey) {
         addr = window.solana.publicKey.toString();
         localStorage.setItem(WINKY_WALLET_STORAGE_KEY, addr);
       }
-      if (addr) updateWalletUi(addr); else updateWalletUi(null);
-      return addr;
+      updateWalletUi(addr);
     }
 
     // ==============================
-    // PORTFOLIO via WORKER
-    // ==============================
-
-    function formatAmount(num) {
-      if (num == null || isNaN(num)) return "—";
-      const n = Number(num);
-      if (Math.abs(n) >= 1) return n.toFixed(4);
-      return n.toFixed(6);
-    }
-
-    function shortenMint(addr) {
-      if (!addr || addr.length < 8) return addr || "";
-      return addr.slice(0, 4) + "…" + addr.slice(-4);
-    }
-
-    async function fetchTokenAccountsFromWorker(walletAddress) {
-      const url = `${PORTFOLIO_WORKER_URL}?wallet=${encodeURIComponent(walletAddress)}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error("Worker HTTP " + res.status);
-      }
-      const json = await res.json();
-      if (!json.success) {
-        throw new Error(json.message || "Worker returned success=false");
-      }
-      const tokens = Array.isArray(json.tokens)
-        ? json.tokens
-        : json.data && Array.isArray(json.data.tokens)
-        ? json.data.tokens
-        : [];
-      return tokens;
-    }
-
-    async function loadPortfolio(walletAddress) {
-      const tbody = document.getElementById("portfolio-rows");
-      const stakingAvailEl = document.getElementById("staking-available");
-      if (!tbody) return;
-
-      tbody.innerHTML =
-        '<tr class="table-message-row"><td colspan="2">Loading portfolio from worker…</td></tr>';
-      if (stakingAvailEl) stakingAvailEl.textContent = "0";
-
-      try {
-        const tokensArr = await fetchTokenAccountsFromWorker(walletAddress);
-        if (!tokensArr.length) {
-          tbody.innerHTML =
-            '<tr class="table-message-row"><td colspan="2">No SPL token accounts found for this wallet.</td></tr>';
-          return;
-        }
-
-        let winkyBalance = 0;
-
-        const mapped = tokensArr.map((t) => {
-          const mint = t.mint;
-          const amount = t.amount || 0;
-
-          if (WINKY_MINT && mint === WINKY_MINT) {
-            winkyBalance = amount || 0;
-          }
-
-          return { mint, amount };
-        });
-
-        mapped.sort((a, b) => (b.amount || 0) - (a.amount || 0));
-
-        const rows = mapped.map((t) => {
-          const explorerUrl =
-            "https://solscan.io/token/" + encodeURIComponent(t.mint);
-          return `
-            <tr>
-              <td>
-                <div class="token-cell">
-                  <div>
-                    <div class="token-name">
-                      <a href="${explorerUrl}" target="_blank" rel="noreferrer">
-                        ${shortenMint(t.mint)}
-                      </a>
-                    </div>
-                    <div class="token-symbol">Mint: ${t.mint}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="number-cell">${formatAmount(t.amount)}</td>
-            </tr>
-          `;
-        });
-
-        tbody.innerHTML = rows.join("");
-
-        if (stakingAvailEl) {
-          stakingAvailEl.textContent = winkyBalance
-            ? winkyBalance.toFixed(4)
-            : "0";
-        }
-      } catch (err) {
-        console.error("Portfolio load failed:", err);
-        tbody.innerHTML =
-          '<tr class="table-message-row"><td colspan="2">Failed to load portfolio. ' +
-          (err && err.message ? err.message : "") +
-          "</td></tr>";
-      }
-    }
-
-    function loadPortfolioIfReady(initialAddress) {
-      const addr = initialAddress || localStorage.getItem(WINKY_WALLET_STORAGE_KEY);
-      if (!addr) return;
-      const addrEl = document.getElementById("wallet-address");
-      if (addrEl) addrEl.textContent = addr;
-      loadPortfolio(addr);
-    }
-
-    // ==============================
-    // STAKING PREVIEW
+    // STAKING PREVIEW LOGIK (nur UI)
     // ==============================
     function initStakingPreview() {
       const stakeBtn   = document.getElementById("staking-stake-btn");
@@ -680,6 +578,7 @@
 
       if (!stakeBtn || !unstakeBtn || !amountEl || !availEl || !stakedEl) return;
 
+      let fakeAvailable = 0;
       let fakeStaked = 0;
 
       function parseAmount() {
@@ -688,27 +587,26 @@
         return isNaN(n) ? 0 : n;
       }
 
+      function refreshUi() {
+        availEl.textContent  = fakeAvailable.toFixed(4);
+        stakedEl.textContent = fakeStaked.toFixed(4);
+      }
+
       stakeBtn.addEventListener("click", () => {
         const amt = parseAmount();
-        const available = parseFloat(availEl.textContent || "0");
         if (!amt || amt <= 0) {
           alert("Enter a positive $WINKY amount to stake (preview only).");
           return;
         }
-        if (amt > available) {
-          alert("You don't have that much $WINKY available (preview check).");
-          return;
-        }
-        fakeStaked += amt;
-        availEl.textContent  = (available - amt).toFixed(4);
-        stakedEl.textContent = fakeStaked.toFixed(4);
+        fakeAvailable = Math.max(0, fakeAvailable - amt);
+        fakeStaked   += amt;
         amountEl.value = "";
+        refreshUi();
         alert("Staking preview only – no on-chain transaction sent.");
       });
 
       unstakeBtn.addEventListener("click", () => {
         const amt = parseAmount();
-        const available = parseFloat(availEl.textContent || "0");
         if (!amt || amt <= 0) {
           alert("Enter a positive $WINKY amount to unstake (preview only).");
           return;
@@ -717,21 +615,22 @@
           alert("You don't have that much preview-staked $WINKY.");
           return;
         }
-        fakeStaked -= amt;
-        availEl.textContent  = (available + amt).toFixed(4);
-        stakedEl.textContent = fakeStaked.toFixed(4);
+        fakeStaked   -= amt;
+        fakeAvailable += amt;
         amountEl.value = "";
+        refreshUi();
         alert("Unstaking preview only – no on-chain transaction sent.");
       });
+
+      refreshUi();
     }
 
     // ==============================
     // INIT
     // ==============================
     document.addEventListener("DOMContentLoaded", () => {
-      const addr = initWalletButton();
+      initWalletButton();
       initStakingPreview();
-      loadPortfolioIfReady(addr);
     });
   </script>
 </body>
