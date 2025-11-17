@@ -358,13 +358,14 @@
       white-space: nowrap;
     }
 
-    .token-metrics {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 16px;
-      margin-bottom: 16px;
-    }
+  .token-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
 
     .token-metric-label {
       font-size: 11px;
@@ -917,47 +918,74 @@
         </div>
       </section>
 
-      <!-- TOKENOMICS (EINFACH, OHNE DUPLIKATE) -->
-      <section id="tokenomics">
-        <div class="section-label">Tokenomics (draft)</div>
-        <h2 class="section-title">$WINKY supply &amp; usage</h2>
+           <!-- WINKY TOKEN -->
+      <section id="token">
+        <div class="section-label">Winky token</div>
+        <h2 class="section-title">$WINKY – live on Solana</h2>
         <p class="section-text">
-          Exact numbers can still change. The basic idea: fair supply, no crazy team locks
-          and a treasury that actually gets used for listings, safety tools and memes.
+          The $WINKY meme token is now live on Solana. Data below is pulled from on-chain DEX
+          liquidity and updates automatically – so you can see market cap, liquidity, 24h volume and 24h
+          change in real time.
         </p>
 
-        <div class="tokenomics-grid">
-          <article class="tokenomics-card">
-            <h3>Launch model</h3>
-            <div class="tokenomics-main">100% community owned</div>
-            <p class="tokenomics-note">
-              $WINKY will launch as a fair-launch on <strong>PumpFun</strong>.
-              All tokens are minted directly by the PumpFun contract – there is no presale,
-              no private team round and no VC allocation.
-            </p>
-          </article>
+        <div class="token-panel">
+          <div>
+            <span class="token-address-label">Contract address</span>
+            <div class="token-address-box">
+              <span id="winky-ca">FBMBdBkSP5Vg3WLiNuHCbAJQ8RXoqsQcnZ7PbQiPpump</span>
+              <div class="token-pill">LIVE</div>
+            </div>
+          </div>
 
-          <article class="tokenomics-card">
-            <h3>Total supply</h3>
-            <div class="tokenomics-main">Defined by PumpFun</div>
-            <p class="tokenomics-note">
-              The exact total supply is whatever <strong>PumpFun</strong> mints when the pool
-              is created. Winky does not change this number and cannot mint extra tokens –
-              no hidden mint function, no extra supply later.
-            </p>
-          </article>
+          <div class="token-metrics">
+            <div>
+              <span class="token-metric-label">Market cap</span>
+              <div class="token-metric-value" id="winky-mcap">Loading…</div>
+              <div class="token-metric-note">Live estimate from DEX data</div>
+            </div>
+            <div>
+              <span class="token-metric-label">Liquidity</span>
+              <div class="token-metric-value" id="winky-liquidity">Loading…</div>
+              <div class="token-metric-note">Total pooled liquidity (USD)</div>
+            </div>
+            <div>
+              <span class="token-metric-label">24h volume</span>
+              <div class="token-metric-value" id="winky-volume-24h">Loading…</div>
+              <div class="token-metric-note">Trading volume last 24h</div>
+            </div>
+            <div>
+              <span class="token-metric-label">24h change</span>
+              <div class="token-metric-value" id="winky-change-24h">Loading…</div>
+              <div class="token-metric-note">Price change last 24h</div>
+            </div>
+          </div>
 
-          <article class="tokenomics-card">
-            <h3>Treasury &amp; ecosystem</h3>
-            <div class="tokenomics-main">Fee-based funding only</div>
-            <p class="tokenomics-note">
-              Winky does not receive any part of the $WINKY token supply.
-              All ecosystem funding comes from small launch fees (~2 USD per token)
-              and optional future fees for advanced tools. No token allocation.
-            </p>
-          </article>
+          <div class="token-actions">
+            <a class="btn btn-primary btn-wide"
+               href="https://pump.fun/coin/FBMBdBkSP5Vg3WLiNuHCbAJQ8RXoqsQcnZ7PbQiPpump"
+               target="_blank" rel="noreferrer">
+              Trade $WINKY on Pump.fun
+            </a>
+            <a class="btn btn-secondary btn-wide"
+               href="https://x.com"
+               target="_blank" rel="noreferrer">
+              Follow on X
+            </a>
+          </div>
+
+          <!-- Birdeye Chart -->
+          <div style="margin-top:18px; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
+            <iframe
+              width="100%"
+              height="420"
+              src="https://birdeye.so/tv-widget/FBMBdBkSP5Vg3WLiNuHCbAJQ8RXoqsQcnZ7PbQiPpump?chain=solana&viewMode=pair&chartInterval=15&chartType=Candle&chartTimezone=UTC&chartLeftToolbar=show&theme=dark"
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
         </div>
       </section>
+
 
       <!-- FAQ -->
       <section id="faq">
@@ -1139,76 +1167,81 @@
 
     document.addEventListener("DOMContentLoaded", initWinkyWalletButton);
   </script>
-    <!-- LIVE TOKEN METRICS (DexScreener) -->
   <script>
     const WINKY_TOKEN_ADDRESS = "FBMBdBkSP5Vg3WLiNuHCbAJQ8RXoqsQcnZ7PbQiPpump";
+    const WINKY_CHAIN_ID = "solana";
     const WINKY_DEXSCREENER_URL =
-      `https://api.dexscreener.com/token-pairs/v1/solana/${WINKY_TOKEN_ADDRESS}`;
+      `https://api.dexscreener.com/tokens/v1/${WINKY_CHAIN_ID}/${WINKY_TOKEN_ADDRESS}`;
 
-    function winkyFormatUsd(value) {
-      if (typeof value !== "number" || !isFinite(value)) return "–";
-      if (value >= 1_000_000_000) return "$" + (value / 1_000_000_000).toFixed(2) + "B";
-      if (value >= 1_000_000)     return "$" + (value / 1_000_000).toFixed(2) + "M";
-      if (value >= 1_000)         return "$" + (value / 1_000).toFixed(2) + "k";
-      return "$" + value.toFixed(4);
+    function firstNumber(obj) {
+      if (!obj) return null;
+      for (const key of Object.keys(obj)) {
+        const v = obj[key];
+        if (typeof v === "number") return v;
+      }
+      return null;
     }
 
-    async function updateWinkyTokenMetrics() {
+    function formatUsd(value) {
+      if (value == null || isNaN(value)) return "–";
+      const v = Number(value);
+      if (v >= 1_000_000_000) return "$" + (v / 1_000_000_000).toFixed(2) + "B";
+      if (v >= 1_000_000)     return "$" + (v / 1_000_000).toFixed(2) + "M";
+      if (v >= 1_000)         return "$" + (v / 1_000).toFixed(1) + "k";
+      return "$" + v.toFixed(0);
+    }
+
+    function formatPercent(value) {
+      if (value == null || isNaN(value)) return "–";
+      const v = Number(value);
+      const sign = v > 0 ? "+" : "";
+      return sign + v.toFixed(2) + "%";
+    }
+
+    async function loadWinkyDexData() {
+      const mcapEl   = document.getElementById("winky-mcap");
+      const liqEl    = document.getElementById("winky-liquidity");
+      const volEl    = document.getElementById("winky-volume-24h");
+      const changeEl = document.getElementById("winky-change-24h");
+
+      if (!mcapEl || !liqEl || !volEl || !changeEl) return;
+
       try {
-        const res = await fetch(WINKY_DEXSCREENER_URL, { cache: "no-store" });
+        const res = await fetch(WINKY_DEXSCREENER_URL);
         if (!res.ok) throw new Error("HTTP " + res.status);
+
         const data = await res.json();
+        // tokens/v1 gibt ein ARRAY zurück
+        const pair = Array.isArray(data) && data.length ? data[0] : null;
+        if (!pair) throw new Error("No pair data for WINKY");
 
-        const pair = data && data.pairs && data.pairs[0];
-        if (!pair) return;
+        const marketCap   = pair.marketCap ?? null;
+        const liquidity   = pair.liquidity && pair.liquidity.usd != null
+                          ? pair.liquidity.usd
+                          : null;
+        const volume24h   = (pair.volume && (pair.volume.h24 ?? firstNumber(pair.volume))) ?? null;
+        const change24h   = (pair.priceChange && (pair.priceChange.h24 ?? firstNumber(pair.priceChange))) ?? null;
 
-        const marketCapEl = document.getElementById("winky-mcap");
-        const liquidityEl = document.getElementById("winky-liquidity");
-        const volumeEl    = document.getElementById("winky-volume");
-        const changeEl    = document.getElementById("winky-change");
+        mcapEl.textContent   = formatUsd(marketCap);
+        liqEl.textContent    = formatUsd(liquidity);
+        volEl.textContent    = formatUsd(volume24h);
+        changeEl.textContent = formatPercent(change24h);
 
-        if (marketCapEl) {
-          marketCapEl.textContent = typeof pair.marketCap === "number"
-            ? winkyFormatUsd(pair.marketCap)
-            : "–";
-        }
-
-        if (liquidityEl) {
-          const liqUsd = pair.liquidity && pair.liquidity.usd;
-          liquidityEl.textContent = typeof liqUsd === "number"
-            ? winkyFormatUsd(liqUsd)
-            : "–";
-        }
-
-        if (volumeEl) {
-          const vol24 = pair.volume && pair.volume["24h"];
-          volumeEl.textContent = typeof vol24 === "number"
-            ? winkyFormatUsd(vol24)
-            : "–";
-        }
-
-        if (changeEl) {
-          const change24 = pair.priceChange && pair.priceChange["24h"];
-          if (typeof change24 === "number") {
-            const sign = change24 > 0 ? "+" : "";
-            changeEl.textContent = sign + change24.toFixed(2) + "%";
-            changeEl.style.color = change24 >= 0 ? "var(--green)" : "var(--danger)";
-          } else {
-            changeEl.textContent = "–";
-            changeEl.style.color = "";
-          }
+        if (change24h != null && !isNaN(change24h)) {
+          changeEl.style.color = change24h >= 0 ? "var(--green)" : "var(--danger)";
         }
       } catch (err) {
-        console.error("Failed to load $WINKY token data", err);
+        console.error("Failed to load WINKY data from Dexscreener:", err);
+        mcapEl.textContent   = "N/A";
+        liqEl.textContent    = "N/A";
+        volEl.textContent    = "N/A";
+        changeEl.textContent = "N/A";
       }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      updateWinkyTokenMetrics();
-      // alle 60 Sekunden aktualisieren
-      setInterval(updateWinkyTokenMetrics, 60_000);
-    });
+    document.addEventListener("DOMContentLoaded", loadWinkyDexData);
   </script>
+
 
 </body>
 </html>
